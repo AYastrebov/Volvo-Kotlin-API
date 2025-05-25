@@ -1,4 +1,4 @@
-rootProject.name = "volvo-api"
+rootProject.name = "volvo"
 
 pluginManagement {
     repositories {

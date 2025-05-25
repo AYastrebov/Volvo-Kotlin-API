@@ -10,11 +10,9 @@ plugins {
     id("convention.publication")
 }
 
-val projectId = "com.github.ayastrebov.volvo.client"
-
-group = projectId
 val deployVersion = findProperty("VolvoApiClientDeployVersion") as String?
 version = deployVersion?.removePrefix("v") ?: "0.0.1-SNAPSHOT"
+group = "com.github.ayastrebov.volvo"
 description = "Volvo API client for Kotlin"
 
 kotlin {
@@ -68,26 +66,9 @@ android {
     }
 }
 
-//val sourcesJar = tasks.register<Jar>("sourcesJar") {
-//    archiveClassifier.set("sources")
-//    from(project.sourceSets.main.map { it.allSource })
-//}
-//val dokkaJavadocJar = tasks.register<Jar>("dokkaJavadocJar") {
-//    archiveClassifier.set("javadoc")
-//    from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
-//}
-//
-//publishing {
-//    publications {
-//        create<MavenPublication>("telegram") {
-//            groupId = projectId
-//            artifactId = project.name
-//            version = project.version.toString()
-//            description = project.description
-//
-//            from(components["java"])
-//            artifact(sourcesJar)
-//            artifact(dokkaJavadocJar)
-//        }
-//    }
-//}
+publishing.publications.create<MavenPublication>("volvo") {
+    groupId = project.group.toString()
+    artifactId = project.name
+    version = project.version.toString()
+    description = project.description
+}
