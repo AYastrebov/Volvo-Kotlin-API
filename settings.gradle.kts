@@ -1,13 +1,14 @@
 rootProject.name = "volvo"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
         google {
-            content { 
-              	includeGroupByRegex("com\\.android.*")
-              	includeGroupByRegex("com\\.google.*")
-              	includeGroupByRegex("androidx.*")
-              	includeGroupByRegex("android.*")
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+                includeGroupByRegex("android.*")
             }
         }
         gradlePluginPortal()
@@ -17,7 +18,7 @@ pluginManagement {
 
 
 plugins {
-    id("com.gradle.develocity") version("4.0.1")
+    id("com.gradle.develocity") version ("4.0.1")
 }
 
 develocity {
@@ -31,11 +32,11 @@ develocity {
 dependencyResolutionManagement {
     repositories {
         google {
-            content { 
-              	includeGroupByRegex("com\\.android.*")
-              	includeGroupByRegex("com\\.google.*")
-              	includeGroupByRegex("androidx.*")
-              	includeGroupByRegex("android.*")
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+                includeGroupByRegex("android.*")
             }
         }
         mavenCentral()
@@ -44,4 +45,4 @@ dependencyResolutionManagement {
 
 includeBuild("convention-plugins")
 include(":volvo-api-client")
-
+include(":volvo-api-core")
