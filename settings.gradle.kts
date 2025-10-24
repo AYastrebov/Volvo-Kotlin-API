@@ -1,4 +1,4 @@
-rootProject.name = "volvo"
+rootProject.name = "volvo-kotlin-api"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

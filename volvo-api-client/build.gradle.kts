@@ -68,20 +68,11 @@ kotlin {
             implementation(kotlin("test-wasm-js"))
         }
     }
-
-    //https://kotlinlang.org/docs/native-objc-interop.html#export-of-kdoc-comments-to-generated-objective-c-headers
-    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
-        compilations["main"].compileTaskProvider.configure {
-            compilerOptions {
-                freeCompilerArgs.add("-Xexport-kdoc")
-            }
-        }
-    }
 }
 
 android {
     namespace = "com.github.ayastrebov.volvo.client"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 21
@@ -94,7 +85,7 @@ buildConfig {
 
     buildConfigField("API_URL", "https://api.volvocars.com")
     buildConfigField("CONNECTED_VEHICLE_API", "connected-vehicle/v2/vehicles")
-    buildConfigField("ENERGY_API", "energy/v1/vehicles")
+    buildConfigField("ENERGY_API", "energy/v2/vehicles")
     buildConfigField("EXTENDED_VEHICLE_API", "extended-vehicle/v1/vehicles")
     buildConfigField("LOCATION_API", "location/v1/vehicles")
 }
