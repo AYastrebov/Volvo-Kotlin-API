@@ -1,17 +1,6 @@
 package com.github.ayastrebov.volvo.api.client.internal.http
 
-import com.github.ayastrebov.volvo.api.exception.AuthenticationException
-import com.github.ayastrebov.volvo.api.exception.GenericIOException
-import com.github.ayastrebov.volvo.api.exception.InvalidRequestException
-import com.github.ayastrebov.volvo.api.exception.VolvoAPIException
-import com.github.ayastrebov.volvo.api.exception.PermissionException
-import com.github.ayastrebov.volvo.api.exception.RateLimitException
-import com.github.ayastrebov.volvo.api.exception.UnknownException
-import com.github.ayastrebov.volvo.api.exception.VolvoApiError
-import com.github.ayastrebov.volvo.api.exception.VolvoException
-import com.github.ayastrebov.volvo.api.exception.VolvoHttpException
-import com.github.ayastrebov.volvo.api.exception.VolvoServerException
-import com.github.ayastrebov.volvo.api.exception.VolvoTimeoutException
+import com.github.ayastrebov.volvo.api.exception.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.network.sockets.*
@@ -19,8 +8,8 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.util.reflect.*
-import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.CancellationException
+import kotlinx.io.IOException
 
 /** HTTP transport layer */
 internal class HttpTransport(private val httpClient: HttpClient) : HttpRequester {

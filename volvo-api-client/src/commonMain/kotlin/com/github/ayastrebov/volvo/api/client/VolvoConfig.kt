@@ -11,21 +11,21 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Volvo API client configuration.
  *
- * @param token OpenAI Token
+ * @param apiKey VCC Api Key
+ * @param token VCC Access Token
  * @param logging client logging configuration
  * @param timeout http client timeout
  * @param headers extra http headers
- * @param organization OpenAI organization ID
  * @param proxy HTTP proxy url
  * @param retry rate limit retry configuration
  * @param engine explicit ktor engine for http requests.
  * @param httpClientConfig additional custom client configuration
  */
-public class VolvoApiConfig(
+public class VolvoConfig(
+    public val apiKey: String,
     public val token: String,
     public val logging: LoggingConfig = LoggingConfig(),
     public val timeout: Timeout = Timeout(socket = 30.seconds),
-    public val organization: String? = null,
     public val headers: Map<String, String> = emptyMap(),
     public val proxy: ProxyConfig? = null,
     public val retry: RetryStrategy = RetryStrategy(),

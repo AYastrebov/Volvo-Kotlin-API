@@ -1,4 +1,4 @@
 package com.github.ayastrebov.volvo.api
 
 @VolvoApiDsl
-public annotation class ConnectedVehicleApi
+public annotation class LocationApiDsl

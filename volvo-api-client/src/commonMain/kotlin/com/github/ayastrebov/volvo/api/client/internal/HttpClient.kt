@@ -1,7 +1,7 @@
 package com.github.ayastrebov.volvo.api.client.internal
 
 import com.github.ayastrebov.volvo.api.client.ProxyConfig
-import com.github.ayastrebov.volvo.api.client.VolvoApiConfig
+import com.github.ayastrebov.volvo.api.client.VolvoConfig
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogLevel
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogger
 import com.github.ayastrebov.volvo.client.ApiConfig
@@ -21,7 +21,7 @@ import kotlin.time.DurationUnit
 /**
  * Default Http Client.
  */
-internal fun createHttpClient(config: VolvoApiConfig): HttpClient {
+internal fun createHttpClient(config: VolvoConfig): HttpClient {
     val configuration:  HttpClientConfig<*>.() -> Unit = {
         engine {
             config.proxy?.let { proxyConfig ->
@@ -76,6 +76,9 @@ internal fun createHttpClient(config: VolvoApiConfig): HttpClient {
 
         defaultRequest {
             url(ApiConfig.API_URL)
+            headers {
+                append("vcc-api-key", config.apiKey)
+            }
         }
 
         expectSuccess = true
