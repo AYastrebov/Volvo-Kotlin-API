@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
  * @param engine explicit ktor engine for http requests.
  * @param httpClientConfig additional custom client configuration
  */
-public class VolvoConfig(
+public class VolvoCarsConfig(
     public val apiKey: String,
     public val token: String,
     public val logging: LoggingConfig = LoggingConfig(),

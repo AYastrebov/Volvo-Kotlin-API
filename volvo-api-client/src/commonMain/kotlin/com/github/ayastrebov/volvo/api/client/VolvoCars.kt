@@ -1,15 +1,15 @@
 package com.github.ayastrebov.volvo.api.client
 
-import com.github.ayastrebov.volvo.api.client.internal.VolvoApi
+import com.github.ayastrebov.volvo.api.client.internal.VolvoCarsApi
 import com.github.ayastrebov.volvo.api.client.internal.createHttpClient
 import com.github.ayastrebov.volvo.api.client.internal.http.HttpTransport
 import com.github.ayastrebov.volvo.api.http.Timeout
 import io.ktor.client.*
 import kotlin.time.Duration.Companion.seconds
 
-public interface Volvo: ExtendedVehicle, ConnectedVehicle, Location, Energy, AutoCloseable
+public interface VolvoCars: ExtendedVehicle, ConnectedVehicle, Location, Energy, AutoCloseable
 
-public fun Volvo(
+public fun VolvoCars(
     apiKey: String,
     token: String,
     logging: LoggingConfig = LoggingConfig(),
@@ -18,8 +18,8 @@ public fun Volvo(
     proxy: ProxyConfig? = null,
     retry: RetryStrategy = RetryStrategy(),
     httpClientConfig: HttpClientConfig<*>.() -> Unit = {}
-): Volvo = Volvo(
-    config = VolvoConfig(
+): VolvoCars = VolvoCars(
+    config = VolvoCarsConfig(
         apiKey = apiKey,
         token = token,
         logging = logging,
@@ -32,12 +32,12 @@ public fun Volvo(
 )
 
 /**
- * Creates an instance of [VolvoApi].
+ * Creates an instance of [VolvoCarsApi].
  *
  * @param config client config
  */
-public fun Volvo(config: VolvoConfig): Volvo {
+public fun VolvoCars(config: VolvoCarsConfig): VolvoCars {
     val httpClient = createHttpClient(config)
     val transport = HttpTransport(httpClient)
-    return VolvoApi(transport)
+    return VolvoCarsApi(transport)
 }
