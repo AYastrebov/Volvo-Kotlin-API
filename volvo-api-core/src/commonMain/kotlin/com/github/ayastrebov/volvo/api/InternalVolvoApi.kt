@@ -12,7 +12,6 @@ package com.github.ayastrebov.volvo.api
     AnnotationTarget.PROPERTY,
     AnnotationTarget.FIELD,
     AnnotationTarget.CONSTRUCTOR,
-    AnnotationTarget.PROPERTY_SETTER,
     AnnotationTarget.PROPERTY_SETTER
 )
 @RequiresOptIn(
