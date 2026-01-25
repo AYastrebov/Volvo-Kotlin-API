@@ -43,6 +43,6 @@ dependencyResolutionManagement {
     }
 }
 
-includeBuild("convention-plugins")
 include(":volvo-api-client")
 include(":volvo-api-core")
+include(":volvo-api-integration-tests")
