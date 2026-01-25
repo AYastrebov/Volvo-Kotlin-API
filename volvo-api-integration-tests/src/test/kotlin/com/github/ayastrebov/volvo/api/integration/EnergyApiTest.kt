@@ -1,6 +1,7 @@
 package com.github.ayastrebov.volvo.api.integration
 
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -14,7 +15,7 @@ import kotlin.test.assertTrue
  * Tests are parameterized to run for ALL vehicles in the user's account.
  *
  * Note: Energy API endpoints are only available for electric and hybrid vehicles.
- * Tests will be skipped if the user doesn't have Energy API access.
+ * Tests will be skipped if the vehicle doesn't support Energy API (data=null).
  */
 @DisplayName("Energy API Integration Tests")
 class EnergyApiTest : BaseIntegrationTest() {
@@ -29,7 +30,7 @@ class EnergyApiTest : BaseIntegrationTest() {
 
         logResponse("getCapabilities", vin, response)
         assertSuccessStatus(response.status)
-        assertNotNull(response.data, "Capabilities should not be null")
+        assumeTrue(response.data != null, "Skipping: Vehicle $vin doesn't support Energy API (not electric/hybrid)")
     }
 
     @ParameterizedTest(name = "Get energy state for VIN {0}")
@@ -42,7 +43,7 @@ class EnergyApiTest : BaseIntegrationTest() {
 
         logResponse("getEnergyState", vin, response)
         assertSuccessStatus(response.status)
-        assertNotNull(response.data, "Energy state should not be null")
+        assumeTrue(response.data != null, "Skipping: Vehicle $vin doesn't support Energy API (not electric/hybrid)")
     }
 
     @ParameterizedTest(name = "Energy capabilities and state consistency for VIN {0}")
