@@ -32,10 +32,11 @@ Kotlin Multiplatform library for Volvo Vehicle APIs (Connected Vehicle, Energy, 
 ## Project Structure
 
 ```
-├── volvo-api-client/     # Main client library (Ktor HTTP client implementation)
-├── volvo-api-core/       # Core APIs, exceptions, logging abstractions
-├── OpenApi/              # OpenAPI specifications for Volvo APIs
-└── gradle/               # Gradle wrapper and version catalog
+├── volvo-api-client/            # Main client library (Ktor HTTP client implementation)
+├── volvo-api-core/              # Core APIs, exceptions, logging abstractions
+├── volvo-api-integration-tests/ # Integration tests against real Volvo API
+├── OpenApi/                     # OpenAPI specifications for Volvo APIs
+└── gradle/                      # Gradle wrapper and version catalog
 ```
 
 ## Architecture
@@ -170,6 +171,40 @@ val client = createTestClient(capturingEngine.engine)
 // ... make request ...
 assertEquals(HttpMethod.Post, capturingEngine.requests.first().method)
 ```
+
+### Integration Tests
+
+Integration tests in `volvo-api-integration-tests/` run against the real Volvo API.
+
+```bash
+# Run integration tests
+./gradlew :volvo-api-integration-tests:test
+
+# Fetch VINs from Volvo API (prints config for local.properties)
+./gradlew :volvo-api-integration-tests:fetchVins
+```
+
+#### Configuration
+
+Via environment variables:
+```bash
+export VOLVO_API_KEY=your-vcc-api-key
+export VOLVO_VINS=VIN1,VIN2
+export VOLVO_TOKEN_CONNECTED_VEHICLE=your-token
+export VOLVO_TOKEN_ENERGY=your-token
+export VOLVO_TOKEN_LOCATION=your-token
+```
+
+Via `local.properties`:
+```properties
+volvo.apiKey=your-vcc-api-key
+volvo.vins=VIN1,VIN2
+volvo.token.connectedVehicle=your-token
+volvo.token.energy=your-token
+volvo.token.location=your-token
+```
+
+Tests skip automatically when credentials are not configured or when API returns permission errors.
 
 ## Publishing Configuration
 

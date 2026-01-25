@@ -40,13 +40,25 @@ Integration tests run against the real Volvo API. Configure credentials via envi
 
 ```bash
 export VOLVO_API_KEY=your-vcc-api-key
-export VOLVO_ACCESS_TOKEN=your-access-token
+export VOLVO_VINS=VIN1,VIN2
+# Separate tokens for different APIs (or use VOLVO_ACCESS_TOKEN for all)
+export VOLVO_TOKEN_CONNECTED_VEHICLE=your-connected-vehicle-token
+export VOLVO_TOKEN_ENERGY=your-energy-token
+export VOLVO_TOKEN_LOCATION=your-location-token
 ```
 
 Or via `local.properties`:
 ```properties
 volvo.apiKey=your-vcc-api-key
-volvo.token=your-access-token
+volvo.vins=VIN1,VIN2
+volvo.token.connectedVehicle=your-connected-vehicle-token
+volvo.token.energy=your-energy-token
+volvo.token.location=your-location-token
+```
+
+To fetch your VINs from the Volvo API:
+```bash
+./gradlew :volvo-api-integration-tests:fetchVins
 ```
 
 Tests skip automatically when credentials are not configured.
