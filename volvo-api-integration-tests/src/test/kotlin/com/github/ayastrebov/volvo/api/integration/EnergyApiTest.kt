@@ -11,6 +11,7 @@ import kotlin.test.assertTrue
  *
  * These tests call the real Volvo API and require valid credentials.
  * Note: Energy API endpoints are only available for electric and hybrid vehicles.
+ * Tests will be skipped if the user doesn't have Energy API access.
  */
 @DisplayName("Energy API Integration Tests")
 class EnergyApiTest : BaseIntegrationTest() {
@@ -18,7 +19,9 @@ class EnergyApiTest : BaseIntegrationTest() {
     @Test
     @DisplayName("Get energy capabilities returns supported features")
     fun getCapabilities_returnsCapabilities() = runTest {
-        val response = client.getCapabilities(vin)
+        val response = runOrSkipOnPermissionDenied("Energy API") {
+            client.getCapabilities(vin)
+        }
 
         logResponse("getCapabilities", response)
         assertSuccessStatus(response.status)
@@ -40,7 +43,9 @@ class EnergyApiTest : BaseIntegrationTest() {
     @Test
     @DisplayName("Get energy state returns current battery/charging state")
     fun getEnergyState_returnsState() = runTest {
-        val response = client.getEnergyState(vin)
+        val response = runOrSkipOnPermissionDenied("Energy API") {
+            client.getEnergyState(vin)
+        }
 
         logResponse("getEnergyState", response)
         assertSuccessStatus(response.status)
@@ -69,8 +74,12 @@ class EnergyApiTest : BaseIntegrationTest() {
     @Test
     @DisplayName("Energy capabilities and state are consistent")
     fun capabilitiesAndState_areConsistent() = runTest {
-        val capabilities = client.getCapabilities(vin)
-        val state = client.getEnergyState(vin)
+        val capabilities = runOrSkipOnPermissionDenied("Energy API") {
+            client.getCapabilities(vin)
+        }
+        val state = runOrSkipOnPermissionDenied("Energy API") {
+            client.getEnergyState(vin)
+        }
 
         assertSuccessStatus(capabilities.status)
         assertSuccessStatus(state.status)
@@ -100,7 +109,9 @@ class EnergyApiTest : BaseIntegrationTest() {
     @Test
     @DisplayName("Battery charge level is within valid range")
     fun batteryChargeLevel_isWithinValidRange() = runTest {
-        val response = client.getEnergyState(vin)
+        val response = runOrSkipOnPermissionDenied("Energy API") {
+            client.getEnergyState(vin)
+        }
 
         logResponse("getEnergyState", response)
         assertSuccessStatus(response.status)
@@ -115,7 +126,9 @@ class EnergyApiTest : BaseIntegrationTest() {
     @Test
     @DisplayName("Electric range is non-negative")
     fun electricRange_isNonNegative() = runTest {
-        val response = client.getEnergyState(vin)
+        val response = runOrSkipOnPermissionDenied("Energy API") {
+            client.getEnergyState(vin)
+        }
 
         logResponse("getEnergyState", response)
         assertSuccessStatus(response.status)

@@ -19,6 +19,8 @@ import kotlin.test.assertTrue
  * - Status Data: Read-only vehicle status endpoints
  * - Commands: Remote command capabilities (read-only checks)
  * - Command Invocations: Actual command execution (tagged as "destructive")
+ *
+ * Tests will be skipped if the user doesn't have the required permissions.
  */
 @DisplayName("Connected Vehicle API Integration Tests")
 class ConnectedVehicleApiTest : BaseIntegrationTest() {
@@ -183,7 +185,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Test
         @DisplayName("Get command list returns available commands")
         fun getCommandList_returnsCommands() = runTest {
-            val response = client.getCommandList(vin)
+            val response = runOrSkipOnPermissionDenied("Commands API") {
+                client.getCommandList(vin)
+            }
 
             logResponse("getCommandList", response)
             assertSuccessStatus(response.status)
@@ -197,7 +201,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Test
         @DisplayName("Get command accessibility returns accessibility status")
         fun getCommandAccessibility_returnsAccessibility() = runTest {
-            val response = client.getCommandAccessibility(vin)
+            val response = runOrSkipOnPermissionDenied("Commands API") {
+                client.getCommandAccessibility(vin)
+            }
 
             logResponse("getCommandAccessibility", response)
             assertSuccessStatus(response.status)
@@ -217,7 +223,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Tag("destructive")
         @DisplayName("Invoke lock command sends lock request")
         fun invokeLock_sendsCommand() = runTest {
-            val response = client.invokeLock(vin)
+            val response = runOrSkipOnPermissionDenied("Lock command") {
+                client.invokeLock(vin)
+            }
 
             logResponse("invokeLock", response)
             assertSuccessStatus(response.status)
@@ -230,7 +238,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Tag("destructive")
         @DisplayName("Invoke unlock command sends unlock request")
         fun invokeUnlock_sendsCommand() = runTest {
-            val response = client.invokeUnlock(vin)
+            val response = runOrSkipOnPermissionDenied("Unlock command") {
+                client.invokeUnlock(vin)
+            }
 
             logResponse("invokeUnlock", response)
             assertSuccessStatus(response.status)
@@ -243,7 +253,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Tag("destructive")
         @DisplayName("Invoke honk command sends honk request")
         fun invokeHonk_sendsCommand() = runTest {
-            val response = client.invokeHonk(vin)
+            val response = runOrSkipOnPermissionDenied("Honk command") {
+                client.invokeHonk(vin)
+            }
 
             logResponse("invokeHonk", response)
             assertSuccessStatus(response.status)
@@ -255,7 +267,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Tag("destructive")
         @DisplayName("Invoke flash command sends flash request")
         fun invokeFlash_sendsCommand() = runTest {
-            val response = client.invokeFlash(vin)
+            val response = runOrSkipOnPermissionDenied("Flash command") {
+                client.invokeFlash(vin)
+            }
 
             logResponse("invokeFlash", response)
             assertSuccessStatus(response.status)
@@ -267,7 +281,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Tag("destructive")
         @DisplayName("Invoke honk and flash command sends combined request")
         fun invokeHonkFlash_sendsCommand() = runTest {
-            val response = client.invokeHonkFlash(vin)
+            val response = runOrSkipOnPermissionDenied("Honk and Flash command") {
+                client.invokeHonkFlash(vin)
+            }
 
             logResponse("invokeHonkFlash", response)
             assertSuccessStatus(response.status)
@@ -279,7 +295,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Tag("destructive")
         @DisplayName("Invoke climatization start command sends start request")
         fun invokeClimatizationStart_sendsCommand() = runTest {
-            val response = client.invokeClimatizationStart(vin)
+            val response = runOrSkipOnPermissionDenied("Climatization command") {
+                client.invokeClimatizationStart(vin)
+            }
 
             logResponse("invokeClimatizationStart", response)
             assertSuccessStatus(response.status)
@@ -291,7 +309,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Tag("destructive")
         @DisplayName("Invoke climatization stop command sends stop request")
         fun invokeClimatizationStop_sendsCommand() = runTest {
-            val response = client.invokeClimatizationStop(vin)
+            val response = runOrSkipOnPermissionDenied("Climatization command") {
+                client.invokeClimatizationStop(vin)
+            }
 
             logResponse("invokeClimatizationStop", response)
             assertSuccessStatus(response.status)
@@ -304,7 +324,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Invoke engine start command sends start request")
         fun invokeEngineStart_sendsCommand() = runTest {
             val request = EngineStartRequest(runtimeMinutes = 5)
-            val response = client.invokeEngineStart(vin, request)
+            val response = runOrSkipOnPermissionDenied("Engine command") {
+                client.invokeEngineStart(vin, request)
+            }
 
             logResponse("invokeEngineStart", response)
             assertSuccessStatus(response.status)
@@ -316,7 +338,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Tag("destructive")
         @DisplayName("Invoke engine stop command sends stop request")
         fun invokeEngineStop_sendsCommand() = runTest {
-            val response = client.invokeEngineStop(vin)
+            val response = runOrSkipOnPermissionDenied("Engine command") {
+                client.invokeEngineStop(vin)
+            }
 
             logResponse("invokeEngineStop", response)
             assertSuccessStatus(response.status)
@@ -328,7 +352,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @Tag("destructive")
         @DisplayName("Invoke lock with reduced guard command sends request")
         fun invokeLockReducedGuard_sendsCommand() = runTest {
-            val response = client.invokeLockReducedGuard(vin)
+            val response = runOrSkipOnPermissionDenied("Lock command") {
+                client.invokeLockReducedGuard(vin)
+            }
 
             logResponse("invokeLockReducedGuard", response)
             assertSuccessStatus(response.status)

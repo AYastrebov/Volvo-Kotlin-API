@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     kotlin("jvm")
 }
@@ -16,12 +18,26 @@ dependencies {
     testImplementation(libs.logback.classic)
 }
 
+// Load local.properties if it exists
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
+}
+
+fun getCredential(envVar: String, propertyKey: String): String {
+    return System.getenv(envVar)
+        ?: localProperties.getProperty(propertyKey)
+        ?: ""
+}
+
 tasks.test {
     useJUnitPlatform()
 
     // Pass system properties for credentials (VIN is fetched from API)
-    systemProperty("volvo.apiKey", System.getenv("VOLVO_API_KEY") ?: findProperty("volvo.apiKey") ?: "")
-    systemProperty("volvo.token", System.getenv("VOLVO_ACCESS_TOKEN") ?: findProperty("volvo.token") ?: "")
+    systemProperty("volvo.apiKey", getCredential("VOLVO_API_KEY", "volvo.apiKey"))
+    systemProperty("volvo.token", getCredential("VOLVO_ACCESS_TOKEN", "volvo.token"))
 
     testLogging {
         events("passed", "skipped", "failed")
