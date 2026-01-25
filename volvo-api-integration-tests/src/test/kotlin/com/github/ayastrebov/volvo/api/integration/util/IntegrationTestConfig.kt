@@ -7,21 +7,22 @@ import java.util.Properties
  * Configuration holder for integration test credentials.
  *
  * Credentials are loaded from (in order of priority):
- * 1. System properties (volvo.apiKey, volvo.token, volvo.vin)
- * 2. Environment variables (VOLVO_API_KEY, VOLVO_ACCESS_TOKEN, VOLVO_VIN)
+ * 1. System properties (volvo.apiKey, volvo.token)
+ * 2. Environment variables (VOLVO_API_KEY, VOLVO_ACCESS_TOKEN)
  * 3. local.properties file in project root
+ *
+ * Note: VIN is fetched dynamically from the API using getVehicleList().
  */
 object IntegrationTestConfig {
 
     val apiKey: String by lazy { loadCredential("volvo.apiKey", "VOLVO_API_KEY") }
     val token: String by lazy { loadCredential("volvo.token", "VOLVO_ACCESS_TOKEN") }
-    val vin: String by lazy { loadCredential("volvo.vin", "VOLVO_VIN") }
 
     /**
      * Returns true if all required credentials are configured.
      */
     val isConfigured: Boolean
-        get() = apiKey.isNotBlank() && token.isNotBlank() && vin.isNotBlank()
+        get() = apiKey.isNotBlank() && token.isNotBlank()
 
     /**
      * Returns a message describing which credentials are missing.
@@ -31,7 +32,6 @@ object IntegrationTestConfig {
             val missing = mutableListOf<String>()
             if (apiKey.isBlank()) missing.add("VOLVO_API_KEY")
             if (token.isBlank()) missing.add("VOLVO_ACCESS_TOKEN")
-            if (vin.isBlank()) missing.add("VOLVO_VIN")
             return "Missing credentials: ${missing.joinToString(", ")}. " +
                 "Set via environment variables or local.properties file."
         }

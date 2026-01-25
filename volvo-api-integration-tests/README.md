@@ -11,12 +11,13 @@ This module contains integration tests that run against the real Volvo API using
 
 ## Configuration
 
+Only API key and access token are required. The VIN is automatically fetched from the API using `getVehicleList()`.
+
 ### Environment Variables (Recommended for CI)
 
 ```bash
 export VOLVO_API_KEY=your-vcc-api-key
 export VOLVO_ACCESS_TOKEN=your-access-token
-export VOLVO_VIN=your-vehicle-vin
 ```
 
 ### local.properties (For Local Development)
@@ -26,7 +27,6 @@ Create a `local.properties` file in the project root:
 ```properties
 volvo.apiKey=your-vcc-api-key
 volvo.token=your-access-token
-volvo.vin=your-vehicle-vin
 ```
 
 > **Note:** The `local.properties` file is gitignored and should never be committed.
@@ -59,12 +59,6 @@ Tests that invoke actual vehicle commands (lock, unlock, honk, etc.) are tagged 
 
 ```bash
 ./gradlew build -x :volvo-api-integration-tests:test
-```
-
-### Override VIN at Runtime
-
-```bash
-./gradlew :volvo-api-integration-tests:test -Dvolvo.vin=YV1XZ00ABC1234567
 ```
 
 ## Test Organization
@@ -122,6 +116,6 @@ Your API key may not have access to the requested endpoint. Check your applicati
 
 You've exceeded the API rate limit. Wait before retrying.
 
-### Vehicle Not Found
+### No Vehicles Found
 
-Ensure the VIN is correct and the vehicle is linked to your Volvo ID.
+Ensure at least one vehicle is linked to your Volvo ID account.

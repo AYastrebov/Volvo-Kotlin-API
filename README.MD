@@ -41,14 +41,12 @@ Integration tests run against the real Volvo API. Configure credentials via envi
 ```bash
 export VOLVO_API_KEY=your-vcc-api-key
 export VOLVO_ACCESS_TOKEN=your-access-token
-export VOLVO_VIN=your-vehicle-vin
 ```
 
 Or via `local.properties`:
 ```properties
 volvo.apiKey=your-vcc-api-key
 volvo.token=your-access-token
-volvo.vin=your-vehicle-vin
 ```
 
 Tests skip automatically when credentials are not configured.

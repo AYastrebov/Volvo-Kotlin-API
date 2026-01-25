@@ -6,6 +6,7 @@ import com.github.ayastrebov.volvo.api.core.LoggingConfig
 import com.github.ayastrebov.volvo.api.http.Timeout
 import com.github.ayastrebov.volvo.api.integration.util.IntegrationTestConfig
 import com.github.ayastrebov.volvo.api.logging.LogLevel
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeAll
@@ -19,27 +20,27 @@ import kotlin.time.Duration.Companion.seconds
  * Tests in this class require valid API credentials to run.
  * If credentials are not configured, tests will be skipped.
  *
+ * The VIN is fetched automatically from the API using getVehicleList().
+ *
  * ## Credential Configuration
  *
  * Set credentials via environment variables:
  * ```
  * export VOLVO_API_KEY=your-vcc-api-key
  * export VOLVO_ACCESS_TOKEN=your-access-token
- * export VOLVO_VIN=your-vehicle-vin
  * ```
  *
  * Or via `local.properties` in the project root:
  * ```
  * volvo.apiKey=your-vcc-api-key
  * volvo.token=your-access-token
- * volvo.vin=your-vehicle-vin
  * ```
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BaseIntegrationTest {
 
     protected lateinit var client: VolvoCars
-    protected val vin: String get() = IntegrationTestConfig.vin
+    protected lateinit var vin: String
 
     @BeforeAll
     fun setUpClient() {
@@ -64,6 +65,17 @@ abstract class BaseIntegrationTest {
                 )
             )
         )
+
+        // Fetch VIN from the API
+        vin = runBlocking {
+            val response = client.getVehicleList()
+            val vehicles = response.data
+            assumeTrue(
+                !vehicles.isNullOrEmpty(),
+                "No vehicles found for this account. At least one vehicle must be linked to run integration tests."
+            )
+            vehicles!!.first().vin ?: error("Vehicle VIN is null")
+        }
 
         println("Integration test client initialized for VIN: ${vin.take(3)}...${vin.takeLast(4)}")
     }

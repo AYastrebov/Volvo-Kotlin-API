@@ -19,10 +19,9 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 
-    // Pass system properties for credentials
+    // Pass system properties for credentials (VIN is fetched from API)
     systemProperty("volvo.apiKey", System.getenv("VOLVO_API_KEY") ?: findProperty("volvo.apiKey") ?: "")
     systemProperty("volvo.token", System.getenv("VOLVO_ACCESS_TOKEN") ?: findProperty("volvo.token") ?: "")
-    systemProperty("volvo.vin", System.getenv("VOLVO_VIN") ?: findProperty("volvo.vin") ?: "")
 
     testLogging {
         events("passed", "skipped", "failed")
