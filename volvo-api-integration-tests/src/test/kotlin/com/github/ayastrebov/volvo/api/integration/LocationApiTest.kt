@@ -2,7 +2,8 @@ package com.github.ayastrebov.volvo.api.integration
 
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -11,45 +12,49 @@ import kotlin.test.assertTrue
  * Integration tests for the Location API.
  *
  * These tests call the real Volvo API and require valid credentials.
+ * Tests are parameterized to run for ALL vehicles in the user's account.
  * Tests will be skipped if the user doesn't have Location API access.
  */
 @DisplayName("Location API Integration Tests")
 class LocationApiTest : BaseIntegrationTest() {
 
-    @Test
+    @ParameterizedTest(name = "Get vehicle location for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Get vehicle location returns GeoJSON Feature")
-    fun getVehicleLocation_returnsLocation() = runTest {
+    fun getVehicleLocation_returnsLocation(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
             client.getVehicleLocation(vin)
         }
 
-        logResponse("getVehicleLocation", response)
+        logResponse("getVehicleLocation", vin, response)
         assertSuccessStatus(response.status)
         assertNotNull(response.data, "Location response should not be null")
         assertEquals("Feature", response.data!!.type, "Response should be a GeoJSON Feature")
     }
 
-    @Test
+    @ParameterizedTest(name = "Location response contains geometry for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Location response contains geometry")
-    fun locationResponse_containsGeometry() = runTest {
+    fun locationResponse_containsGeometry(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
             client.getVehicleLocation(vin)
         }
 
-        logResponse("getVehicleLocation", response)
+        logResponse("getVehicleLocation", vin, response)
         assertSuccessStatus(response.status)
         assertNotNull(response.data?.geometry, "Geometry should not be null")
         assertEquals("Point", response.data!!.geometry!!.type, "Geometry type should be Point")
     }
 
-    @Test
+    @ParameterizedTest(name = "Location coordinates are valid for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Location coordinates are valid")
-    fun locationCoordinates_areValid() = runTest {
+    fun locationCoordinates_areValid(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
             client.getVehicleLocation(vin)
         }
 
-        logResponse("getVehicleLocation", response)
+        logResponse("getVehicleLocation", vin, response)
         assertSuccessStatus(response.status)
 
         val geometry = response.data?.geometry
@@ -71,38 +76,40 @@ class LocationApiTest : BaseIntegrationTest() {
             "Latitude should be between -90 and 90, but was $latitude"
         )
 
-        println("Vehicle location: ($latitude, $longitude)")
+        println("Vehicle location for $vin: ($latitude, $longitude)")
     }
 
-    @Test
+    @ParameterizedTest(name = "Location response contains properties for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Location response contains properties")
-    fun locationResponse_containsProperties() = runTest {
+    fun locationResponse_containsProperties(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
             client.getVehicleLocation(vin)
         }
 
-        logResponse("getVehicleLocation", response)
+        logResponse("getVehicleLocation", vin, response)
         assertSuccessStatus(response.status)
         assertNotNull(response.data?.properties, "Properties should not be null")
 
         // Log available properties for debugging
         // Properties is a Map<String, String>
         response.data?.properties?.let { props ->
-            println("Location properties:")
+            println("Location properties for $vin:")
             props.forEach { (key, value) ->
                 println("  - $key: $value")
             }
         }
     }
 
-    @Test
+    @ParameterizedTest(name = "Location heading is within valid range for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Location heading is within valid range if present")
-    fun locationHeading_isWithinValidRange() = runTest {
+    fun locationHeading_isWithinValidRange(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
             client.getVehicleLocation(vin)
         }
 
-        logResponse("getVehicleLocation", response)
+        logResponse("getVehicleLocation", vin, response)
         assertSuccessStatus(response.status)
 
         // Properties is a Map<String, String>, so we need to parse heading as Double
@@ -111,27 +118,28 @@ class LocationApiTest : BaseIntegrationTest() {
                 heading >= 0.0 && heading < 360.0,
                 "Heading should be between 0 and 360 degrees, but was $heading"
             )
-            println("Vehicle heading: $heading degrees")
+            println("Vehicle heading for $vin: $heading degrees")
         }
     }
 
-    @Test
+    @ParameterizedTest(name = "Location timestamp is present for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Location timestamp is present if available")
-    fun locationTimestamp_isPresent() = runTest {
+    fun locationTimestamp_isPresent(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
             client.getVehicleLocation(vin)
         }
 
-        logResponse("getVehicleLocation", response)
+        logResponse("getVehicleLocation", vin, response)
         assertSuccessStatus(response.status)
 
         // Properties is a Map<String, String>
         val timestamp = response.data?.properties?.get("timestamp")
         if (timestamp != null) {
             assertTrue(timestamp.isNotBlank(), "Timestamp should not be blank")
-            println("Location timestamp: $timestamp")
+            println("Location timestamp for $vin: $timestamp")
         } else {
-            println("Location timestamp not available in response")
+            println("Location timestamp not available in response for $vin")
         }
     }
 }

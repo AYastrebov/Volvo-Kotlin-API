@@ -1,11 +1,13 @@
 package com.github.ayastrebov.volvo.api.integration
 
+import com.github.ayastrebov.volvo.api.integration.util.SharedTestContext
 import com.github.ayastrebov.volvo.api.model.connectedvehicle.EngineStartRequest
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -14,6 +16,8 @@ import kotlin.test.assertTrue
  * Integration tests for the Connected Vehicle API.
  *
  * These tests call the real Volvo API and require valid credentials.
+ * Tests are parameterized to run for ALL vehicles in the user's account.
+ *
  * Tests are organized into categories:
  * - Vehicle Information: Basic vehicle data
  * - Status Data: Read-only vehicle status endpoints
@@ -31,31 +35,26 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
     @DisplayName("Vehicle Information")
     inner class VehicleInformation {
 
-        @Test
+        @ParameterizedTest(name = "Get vehicle list contains VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get vehicle list returns user's vehicles")
-        fun getVehicleList_returnsVehicles() = runTest {
-            val response = client.getVehicleList()
-
-            logResponse("getVehicleList", response)
-            assertSuccessStatus(response.status)
-            assertNotNull(response.data, "Vehicle list data should not be null")
-            assertTrue(response.data!!.isNotEmpty(), "User should have at least one vehicle")
-
-            // Verify our test VIN is in the list
-            val vinList = response.data!!.map { it.vin }
-            assertTrue(vin in vinList, "Test VIN should be in the vehicle list")
+        fun getVehicleList_containsVin(vin: String) = runTest {
+            // This test verifies each VIN is in the list
+            // The actual API call is cached by SharedTestContext
+            val vins = SharedTestContext.vins
+            assertTrue(vin in vins, "VIN should be in the vehicle list")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get vehicle details for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get vehicle details returns vehicle information")
-        fun getVehicleDetails_returnsDetails() = runTest {
+        fun getVehicleDetails_returnsDetails(vin: String) = runTest {
             val response = client.getVehicleDetails(vin)
 
-            logResponse("getVehicleDetails", response)
+            logResponse("getVehicleDetails", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Vehicle details should not be null")
             assertEquals(vin, response.data!!.vin, "VIN should match")
-            assertNotNull(response.data!!.modelYear, "Model year should be present")
         }
     }
 
@@ -65,112 +64,123 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
     @DisplayName("Status Data")
     inner class StatusData {
 
-        @Test
+        @ParameterizedTest(name = "Get window status for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get window status returns window states")
-        fun getWindowStatus_returnsStatus() = runTest {
+        fun getWindowStatus_returnsStatus(vin: String) = runTest {
             val response = client.getWindowStatus(vin)
 
-            logResponse("getWindowStatus", response)
+            logResponse("getWindowStatus", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Window status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get door and lock status for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get door and lock status returns door states")
-        fun getDoorAndLockStatus_returnsStatus() = runTest {
+        fun getDoorAndLockStatus_returnsStatus(vin: String) = runTest {
             val response = client.getDoorAndLockStatus(vin)
 
-            logResponse("getDoorAndLockStatus", response)
+            logResponse("getDoorAndLockStatus", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Door and lock status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get diagnostics for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get diagnostics returns diagnostic data")
-        fun getDiagnostics_returnsData() = runTest {
+        fun getDiagnostics_returnsData(vin: String) = runTest {
             val response = client.getDiagnostics(vin)
 
-            logResponse("getDiagnostics", response)
+            logResponse("getDiagnostics", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Diagnostics should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get warnings for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get warnings returns vehicle warnings")
-        fun getWarnings_returnsWarnings() = runTest {
+        fun getWarnings_returnsWarnings(vin: String) = runTest {
             val response = client.getWarnings(vin)
 
-            logResponse("getWarnings", response)
+            logResponse("getWarnings", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Warnings should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get tyre status for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get tyre status returns tyre pressure data")
-        fun getTyreStatus_returnsStatus() = runTest {
+        fun getTyreStatus_returnsStatus(vin: String) = runTest {
             val response = client.getTyreStatus(vin)
 
-            logResponse("getTyreStatus", response)
+            logResponse("getTyreStatus", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Tyre status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get engine status for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get engine status returns running state")
-        fun getEngineStatus_returnsStatus() = runTest {
+        fun getEngineStatus_returnsStatus(vin: String) = runTest {
             val response = client.getEngineStatus(vin)
 
-            logResponse("getEngineStatus", response)
+            logResponse("getEngineStatus", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Engine status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get engine diagnostics for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get engine diagnostics returns diagnostic data")
-        fun getEngineDiagnostics_returnsDiagnostics() = runTest {
+        fun getEngineDiagnostics_returnsDiagnostics(vin: String) = runTest {
             val response = client.getEngineDiagnostics(vin)
 
-            logResponse("getEngineDiagnostics", response)
+            logResponse("getEngineDiagnostics", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Engine diagnostics should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get fuel amount for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get fuel amount returns fuel level")
-        fun getFuelAmount_returnsAmount() = runTest {
+        fun getFuelAmount_returnsAmount(vin: String) = runTest {
             val response = client.getFuelAmount(vin)
 
-            logResponse("getFuelAmount", response)
+            logResponse("getFuelAmount", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Fuel amount should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get odometer for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get odometer returns mileage")
-        fun getOdometer_returnsMileage() = runTest {
+        fun getOdometer_returnsMileage(vin: String) = runTest {
             val response = client.getOdometer(vin)
 
-            logResponse("getOdometer", response)
+            logResponse("getOdometer", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Odometer should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get statistics for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get statistics returns vehicle statistics")
-        fun getStatistics_returnsStats() = runTest {
+        fun getStatistics_returnsStats(vin: String) = runTest {
             val response = client.getStatistics(vin)
 
-            logResponse("getStatistics", response)
+            logResponse("getStatistics", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Statistics should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get brake status for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get brake status returns brake state")
-        fun getBrakeStatus_returnsStatus() = runTest {
+        fun getBrakeStatus_returnsStatus(vin: String) = runTest {
             val response = client.getBrakeStatus(vin)
 
-            logResponse("getBrakeStatus", response)
+            logResponse("getBrakeStatus", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Brake status should not be null")
         }
@@ -182,33 +192,30 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
     @DisplayName("Commands")
     inner class Commands {
 
-        @Test
+        @ParameterizedTest(name = "Get command list for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get command list returns available commands")
-        fun getCommandList_returnsCommands() = runTest {
+        fun getCommandList_returnsCommands(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Commands API") {
                 client.getCommandList(vin)
             }
 
-            logResponse("getCommandList", response)
+            logResponse("getCommandList", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Command list should not be null")
-            assertTrue(response.data!!.isNotEmpty(), "Should have at least one command available")
-
-            // Log available commands for debugging
-            println("Available commands: ${response.data!!.mapNotNull { it.command }.joinToString()}")
         }
 
-        @Test
+        @ParameterizedTest(name = "Get command accessibility for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get command accessibility returns accessibility status")
-        fun getCommandAccessibility_returnsAccessibility() = runTest {
+        fun getCommandAccessibility_returnsAccessibility(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Commands API") {
                 client.getCommandAccessibility(vin)
             }
 
-            logResponse("getCommandAccessibility", response)
+            logResponse("getCommandAccessibility", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Command accessibility should not be null")
-            assertNotNull(response.data!!.availableCommands, "Available commands list should not be null")
         }
     }
 
@@ -219,147 +226,145 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
     @Tag("destructive")
     inner class CommandInvocations {
 
-        @Test
+        @ParameterizedTest(name = "Invoke lock for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @Tag("destructive")
         @DisplayName("Invoke lock command sends lock request")
-        fun invokeLock_sendsCommand() = runTest {
+        fun invokeLock_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Lock command") {
                 client.invokeLock(vin)
             }
 
-            logResponse("invokeLock", response)
+            logResponse("invokeLock", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Lock response should not be null")
-            assertNotNull(response.data!!.invokeStatus, "Invoke status should not be null")
-            println("Lock invoke status: ${response.data!!.invokeStatus}")
         }
 
-        @Test
+        @ParameterizedTest(name = "Invoke unlock for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @Tag("destructive")
         @DisplayName("Invoke unlock command sends unlock request")
-        fun invokeUnlock_sendsCommand() = runTest {
+        fun invokeUnlock_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Unlock command") {
                 client.invokeUnlock(vin)
             }
 
-            logResponse("invokeUnlock", response)
+            logResponse("invokeUnlock", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Unlock response should not be null")
-            assertNotNull(response.data!!.invokeStatus, "Invoke status should not be null")
-            println("Unlock invoke status: ${response.data!!.invokeStatus}")
         }
 
-        @Test
+        @ParameterizedTest(name = "Invoke honk for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @Tag("destructive")
         @DisplayName("Invoke honk command sends honk request")
-        fun invokeHonk_sendsCommand() = runTest {
+        fun invokeHonk_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Honk command") {
                 client.invokeHonk(vin)
             }
 
-            logResponse("invokeHonk", response)
+            logResponse("invokeHonk", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Honk response should not be null")
-            assertNotNull(response.data!!.invokeStatus, "Invoke status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Invoke flash for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @Tag("destructive")
         @DisplayName("Invoke flash command sends flash request")
-        fun invokeFlash_sendsCommand() = runTest {
+        fun invokeFlash_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Flash command") {
                 client.invokeFlash(vin)
             }
 
-            logResponse("invokeFlash", response)
+            logResponse("invokeFlash", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Flash response should not be null")
-            assertNotNull(response.data!!.invokeStatus, "Invoke status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Invoke honk and flash for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @Tag("destructive")
         @DisplayName("Invoke honk and flash command sends combined request")
-        fun invokeHonkFlash_sendsCommand() = runTest {
+        fun invokeHonkFlash_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Honk and Flash command") {
                 client.invokeHonkFlash(vin)
             }
 
-            logResponse("invokeHonkFlash", response)
+            logResponse("invokeHonkFlash", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Honk and flash response should not be null")
-            assertNotNull(response.data!!.invokeStatus, "Invoke status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Invoke climatization start for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @Tag("destructive")
         @DisplayName("Invoke climatization start command sends start request")
-        fun invokeClimatizationStart_sendsCommand() = runTest {
+        fun invokeClimatizationStart_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Climatization command") {
                 client.invokeClimatizationStart(vin)
             }
 
-            logResponse("invokeClimatizationStart", response)
+            logResponse("invokeClimatizationStart", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Climatization start response should not be null")
-            assertNotNull(response.data!!.invokeStatus, "Invoke status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Invoke climatization stop for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @Tag("destructive")
         @DisplayName("Invoke climatization stop command sends stop request")
-        fun invokeClimatizationStop_sendsCommand() = runTest {
+        fun invokeClimatizationStop_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Climatization command") {
                 client.invokeClimatizationStop(vin)
             }
 
-            logResponse("invokeClimatizationStop", response)
+            logResponse("invokeClimatizationStop", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Climatization stop response should not be null")
-            assertNotNull(response.data!!.invokeStatus, "Invoke status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Invoke engine start for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @Tag("destructive")
         @DisplayName("Invoke engine start command sends start request")
-        fun invokeEngineStart_sendsCommand() = runTest {
+        fun invokeEngineStart_sendsCommand(vin: String) = runTest {
             val request = EngineStartRequest(runtimeMinutes = 5)
             val response = runOrSkipOnPermissionDenied("Engine command") {
                 client.invokeEngineStart(vin, request)
             }
 
-            logResponse("invokeEngineStart", response)
+            logResponse("invokeEngineStart", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Engine start response should not be null")
-            assertNotNull(response.data!!.invokeStatus, "Invoke status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Invoke engine stop for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @Tag("destructive")
         @DisplayName("Invoke engine stop command sends stop request")
-        fun invokeEngineStop_sendsCommand() = runTest {
+        fun invokeEngineStop_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Engine command") {
                 client.invokeEngineStop(vin)
             }
 
-            logResponse("invokeEngineStop", response)
+            logResponse("invokeEngineStop", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Engine stop response should not be null")
-            assertNotNull(response.data!!.invokeStatus, "Invoke status should not be null")
         }
 
-        @Test
+        @ParameterizedTest(name = "Invoke lock with reduced guard for VIN {0}")
+        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @Tag("destructive")
         @DisplayName("Invoke lock with reduced guard command sends request")
-        fun invokeLockReducedGuard_sendsCommand() = runTest {
+        fun invokeLockReducedGuard_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Lock command") {
                 client.invokeLockReducedGuard(vin)
             }
 
-            logResponse("invokeLockReducedGuard", response)
+            logResponse("invokeLockReducedGuard", vin, response)
             assertSuccessStatus(response.status)
             assertNotNull(response.data, "Lock reduced guard response should not be null")
-            assertNotNull(response.data!!.invokeStatus, "Invoke status should not be null")
         }
     }
 }

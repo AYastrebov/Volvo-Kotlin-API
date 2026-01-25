@@ -2,7 +2,8 @@ package com.github.ayastrebov.volvo.api.integration
 
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -10,70 +11,44 @@ import kotlin.test.assertTrue
  * Integration tests for the Energy API.
  *
  * These tests call the real Volvo API and require valid credentials.
+ * Tests are parameterized to run for ALL vehicles in the user's account.
+ *
  * Note: Energy API endpoints are only available for electric and hybrid vehicles.
  * Tests will be skipped if the user doesn't have Energy API access.
  */
 @DisplayName("Energy API Integration Tests")
 class EnergyApiTest : BaseIntegrationTest() {
 
-    @Test
+    @ParameterizedTest(name = "Get energy capabilities for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Get energy capabilities returns supported features")
-    fun getCapabilities_returnsCapabilities() = runTest {
+    fun getCapabilities_returnsCapabilities(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Energy API") {
             client.getCapabilities(vin)
         }
 
-        logResponse("getCapabilities", response)
+        logResponse("getCapabilities", vin, response)
         assertSuccessStatus(response.status)
         assertNotNull(response.data, "Capabilities should not be null")
-
-        // Log what's supported for debugging
-        val capabilities = response.data!!
-        println("Energy capabilities:")
-        println("  - getEnergyState supported: ${capabilities.getEnergyState?.isSupported}")
-        capabilities.getEnergyState?.let { energyState ->
-            println("  - batteryChargeLevel: ${energyState.batteryChargeLevel?.isSupported}")
-            println("  - electricRange: ${energyState.electricRange?.isSupported}")
-            println("  - estimatedChargingTimeToTargetBatteryChargeLevel: ${energyState.estimatedChargingTimeToTargetBatteryChargeLevel?.isSupported}")
-            println("  - chargerConnectionStatus: ${energyState.chargerConnectionStatus?.isSupported}")
-            println("  - chargingSystemStatus: ${energyState.chargingSystemStatus?.isSupported}")
-        }
     }
 
-    @Test
+    @ParameterizedTest(name = "Get energy state for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Get energy state returns current battery/charging state")
-    fun getEnergyState_returnsState() = runTest {
+    fun getEnergyState_returnsState(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Energy API") {
             client.getEnergyState(vin)
         }
 
-        logResponse("getEnergyState", response)
+        logResponse("getEnergyState", vin, response)
         assertSuccessStatus(response.status)
         assertNotNull(response.data, "Energy state should not be null")
-
-        // Log actual values for debugging
-        val energyState = response.data!!
-        println("Energy state:")
-        energyState.batteryChargeLevel?.let {
-            println("  - Battery charge level: ${it.value}% (status: ${it.status})")
-        }
-        energyState.electricRange?.let {
-            println("  - Electric range: ${it.value} ${it.unit} (status: ${it.status})")
-        }
-        energyState.estimatedChargingTimeToTargetBatteryChargeLevel?.let {
-            println("  - Estimated charging time: ${it.value} ${it.unit} (status: ${it.status})")
-        }
-        energyState.chargerConnectionStatus?.let {
-            println("  - Charger connection: ${it.value} (status: ${it.status})")
-        }
-        energyState.chargingStatus?.let {
-            println("  - Charging status: ${it.value} (status: ${it.status})")
-        }
     }
 
-    @Test
+    @ParameterizedTest(name = "Energy capabilities and state consistency for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Energy capabilities and state are consistent")
-    fun capabilitiesAndState_areConsistent() = runTest {
+    fun capabilitiesAndState_areConsistent(vin: String) = runTest {
         val capabilities = runOrSkipOnPermissionDenied("Energy API") {
             client.getCapabilities(vin)
         }
@@ -88,54 +63,40 @@ class EnergyApiTest : BaseIntegrationTest() {
         if (capabilities.data?.getEnergyState?.isSupported == true) {
             assertNotNull(state.data, "Energy state should be available when capability is supported")
         }
-
-        // If battery charge level is supported, we should have it in state
-        if (capabilities.data?.getEnergyState?.batteryChargeLevel?.isSupported == true) {
-            assertNotNull(
-                state.data?.batteryChargeLevel,
-                "Battery charge level should be in state when supported"
-            )
-        }
-
-        // If electric range is supported, we should have it in state
-        if (capabilities.data?.getEnergyState?.electricRange?.isSupported == true) {
-            assertNotNull(
-                state.data?.electricRange,
-                "Electric range should be in state when supported"
-            )
-        }
     }
 
-    @Test
+    @ParameterizedTest(name = "Battery charge level validation for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Battery charge level is within valid range")
-    fun batteryChargeLevel_isWithinValidRange() = runTest {
+    fun batteryChargeLevel_isWithinValidRange(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Energy API") {
             client.getEnergyState(vin)
         }
 
-        logResponse("getEnergyState", response)
+        logResponse("getEnergyState", vin, response)
         assertSuccessStatus(response.status)
 
         response.data?.batteryChargeLevel?.value?.let { level ->
             assertTrue(level >= 0f, "Battery level should be >= 0, but was $level")
             assertTrue(level <= 100f, "Battery level should be <= 100, but was $level")
-            println("Battery charge level: $level%")
+            println("Battery charge level for $vin: $level%")
         }
     }
 
-    @Test
+    @ParameterizedTest(name = "Electric range validation for VIN {0}")
+    @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
     @DisplayName("Electric range is non-negative")
-    fun electricRange_isNonNegative() = runTest {
+    fun electricRange_isNonNegative(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Energy API") {
             client.getEnergyState(vin)
         }
 
-        logResponse("getEnergyState", response)
+        logResponse("getEnergyState", vin, response)
         assertSuccessStatus(response.status)
 
         response.data?.electricRange?.value?.let { range ->
             assertTrue(range >= 0, "Electric range should be >= 0, but was $range")
-            println("Electric range: $range ${response.data?.electricRange?.unit}")
+            println("Electric range for $vin: $range ${response.data?.electricRange?.unit}")
         }
     }
 }

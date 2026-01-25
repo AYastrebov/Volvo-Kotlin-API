@@ -14,6 +14,7 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
 
     testImplementation(kotlin("test-junit5"))
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.11.4")
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.logback.classic)
 }
