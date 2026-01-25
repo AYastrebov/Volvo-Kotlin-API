@@ -3,6 +3,7 @@ package com.github.ayastrebov.volvo.api.integration.util
 import com.github.ayastrebov.volvo.api.client.VolvoCars
 import com.github.ayastrebov.volvo.api.client.VolvoCarsConfig
 import com.github.ayastrebov.volvo.api.core.LoggingConfig
+import com.github.ayastrebov.volvo.api.exception.AuthenticationException
 import com.github.ayastrebov.volvo.api.http.Timeout
 import com.github.ayastrebov.volvo.api.logging.LogLevel
 import kotlinx.coroutines.runBlocking
@@ -115,6 +116,27 @@ object SharedTestContext {
             }
             println("=".repeat(60))
 
+        } catch (e: AuthenticationException) {
+            _initError = """
+                |
+                |============================================================
+                |  AUTHENTICATION FAILED (401 Unauthorized)
+                |============================================================
+                |  Your access token has expired or is invalid.
+                |
+                |  To generate a new token:
+                |  1. Go to https://developer.volvocars.com/apis/
+                |  2. Sign in and navigate to your application
+                |  3. Generate a new access token
+                |  4. Update local.properties with:
+                |     volvo.token=your-new-access-token
+                |
+                |  Or set environment variable:
+                |     export VOLVO_ACCESS_TOKEN=your-new-access-token
+                |============================================================
+            """.trimMargin()
+            _client?.close()
+            _client = null
         } catch (e: Exception) {
             _initError = "Failed to initialize: ${e.message}"
             _client?.close()
