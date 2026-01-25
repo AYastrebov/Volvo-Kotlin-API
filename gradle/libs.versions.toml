@@ -5,7 +5,7 @@ buildConfig = "6.0.7"
 caupain = "1.8.1"
 dokka = "2.1.0"
 kotlin = "2.3.0"
-maven-publish = "0.30.0"
+maven-publish = "0.35.0"
 kotlinx-coroutines = "1.10.2"
 kotlinx-datetime = "0.7.1"
 kotlinx-serialization = "1.10.0"
@@ -50,7 +50,7 @@ junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-para
 
 [plugins]
 
-android-library = { id = "com.android.library", version.ref = "agp" }
+android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 caupain = { id = "com.deezer.caupain", version.ref = "caupain" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka"  }

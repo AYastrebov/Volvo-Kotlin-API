@@ -1,5 +1,6 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
+import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -40,7 +41,10 @@ kotlin {
     explicitApi()
     jvmToolchain(17)
 
-    androidTarget { publishLibraryVariants("release") }
+    androidLibrary {
+        namespace = "com.github.ayastrebov.volvo.client"
+        compileSdk = 36
+    }
     jvm()
     wasmJs { nodejs() }
     js { nodejs() }
@@ -88,21 +92,6 @@ kotlin {
         wasmJsTest.dependencies {
             implementation(kotlin("test-wasm-js"))
         }
-
-        val androidUnitTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-            }
-        }
-    }
-}
-
-android {
-    namespace = "com.github.ayastrebov.volvo.client"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 21
     }
 }
 
