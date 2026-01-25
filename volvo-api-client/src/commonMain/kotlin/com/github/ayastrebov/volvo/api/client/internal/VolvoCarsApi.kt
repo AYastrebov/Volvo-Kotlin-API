@@ -1,9 +1,9 @@
 package com.github.ayastrebov.volvo.api.client.internal
 
-import com.github.ayastrebov.volvo.api.client.ConnectedVehicle
-import com.github.ayastrebov.volvo.api.client.Energy
-import com.github.ayastrebov.volvo.api.client.ExtendedVehicle
-import com.github.ayastrebov.volvo.api.client.Location
+import com.github.ayastrebov.volvo.api.api.ConnectedVehicle
+import com.github.ayastrebov.volvo.api.api.Energy
+import com.github.ayastrebov.volvo.api.api.ExtendedVehicle
+import com.github.ayastrebov.volvo.api.api.Location
 import com.github.ayastrebov.volvo.api.client.VolvoCars
 import com.github.ayastrebov.volvo.api.client.internal.api.ConnectedVehicleApi
 import com.github.ayastrebov.volvo.api.client.internal.api.EnergyApi

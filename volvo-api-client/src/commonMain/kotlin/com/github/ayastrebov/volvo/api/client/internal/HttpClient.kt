@@ -1,7 +1,7 @@
 package com.github.ayastrebov.volvo.api.client.internal
 
-import com.github.ayastrebov.volvo.api.client.ProxyConfig
 import com.github.ayastrebov.volvo.api.client.VolvoCarsConfig
+import com.github.ayastrebov.volvo.api.core.ProxyConfig
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogLevel
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogger
 import com.github.ayastrebov.volvo.client.ApiConfig
@@ -19,7 +19,22 @@ import kotlinx.serialization.json.Json
 import kotlin.time.DurationUnit
 
 /**
- * Default Http Client.
+ * Creates and configures the HTTP client for Volvo API communication.
+ *
+ * Configuration includes:
+ * - **Proxy**: Supports HTTP and SOCKS proxies via [ProxyConfig]
+ * - **JSON Serialization**: Lenient parsing with unknown keys ignored
+ * - **Logging**: Configurable log level with Authorization header sanitization
+ * - **Authentication**: Bearer token authentication (refresh must be handled externally)
+ * - **Timeouts**: Configurable socket, connect, and request timeouts
+ * - **Retry**: Automatic retry with exponential backoff on rate limit (429) responses
+ * - **SSE**: Server-Sent Events support for streaming responses
+ * - **Headers**: User-Agent and VCC API key automatically included
+ *
+ * `expectSuccess = true` ensures non-2xx responses throw exceptions for proper error handling.
+ *
+ * @param config The [VolvoCarsConfig] containing all client settings
+ * @return Configured [HttpClient] instance
  */
 internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
     val configuration:  HttpClientConfig<*>.() -> Unit = {
@@ -77,6 +92,7 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
         defaultRequest {
             url(ApiConfig.API_URL)
             headers {
+                append(HttpHeaders.UserAgent, "VolvoCars-Kotlin-Client/${ApiConfig.VERSION}")
                 append("vcc-api-key", config.apiKey)
             }
         }
@@ -94,7 +110,10 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
 }
 
 /**
- * Internal Json Serializer.
+ * Lenient JSON serializer configured for Volvo API responses.
+ *
+ * - `isLenient = true`: Accepts non-standard JSON (e.g., unquoted strings, trailing commas)
+ * - `ignoreUnknownKeys = true`: Allows API responses to include additional fields without causing deserialization errors
  */
 internal val JsonLenient = Json {
     isLenient = true

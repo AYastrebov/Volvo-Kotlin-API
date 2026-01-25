@@ -4,7 +4,6 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.util.reflect.*
-import kotlinx.coroutines.flow.Flow
 
 /**
  * Http request performer.

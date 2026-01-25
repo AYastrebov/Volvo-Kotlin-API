@@ -42,6 +42,14 @@ internal class HttpTransport(private val httpClient: HttpClient) : HttpRequester
     /**
      * Handles various exceptions that can occur during an API request and converts them into appropriate
      * [VolvoException] instances.
+     *
+     * Exception mapping:
+     * - [CancellationException] → propagated as-is (coroutine cancellation)
+     * - [ClientRequestException] → mapped to [VolvoAPIException] subclass based on status code
+     * - [ServerResponseException] → [VolvoServerException] for 5xx errors
+     * - [HttpRequestTimeoutException], [SocketTimeoutException], [ConnectTimeoutException] → [VolvoTimeoutException]
+     * - [IOException] → [GenericIOException] for network failures
+     * - Other → [VolvoHttpException] as fallback
      */
     private suspend fun handleException(e: Throwable) = when (e) {
         is CancellationException -> e // propagate coroutine cancellation
@@ -56,12 +64,22 @@ internal class HttpTransport(private val httpClient: HttpClient) : HttpRequester
 
     /**
      * Converts a [ClientRequestException] into a corresponding [VolvoAPIException] based on the HTTP status code.
-     * This function helps in handling specific API errors and categorizing them into appropriate exception classes.
+     *
+     * Status code mapping:
+     * - 400, 404, 409, 415 → [InvalidRequestException]
+     * - 401 → [AuthenticationException]
+     * - 403 → [PermissionException]
+     * - 429 → [RateLimitException]
+     * - Other → [UnknownException]
      */
     private suspend fun volvoAPIException(exception: ClientRequestException): VolvoAPIException {
         val response = exception.response
         val status = response.status.value
-        val error = response.body<VolvoApiError>()
+        val error = try {
+            response.body<VolvoApiError>()
+        } catch (e: Exception) {
+            VolvoApiError(detail = VolvoErrorDetails(message = response.status.description))
+        }
         return when(status) {
             429 -> RateLimitException(status, error, exception)
             400, 404, 409, 415 -> InvalidRequestException(status, error, exception)
