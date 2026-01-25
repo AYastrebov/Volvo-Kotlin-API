@@ -17,7 +17,7 @@ import java.util.stream.Stream
  *
  * ## Features
  *
- * - **Shared Client**: All tests share a single VolvoCars client instance
+ * - **Shared Clients**: Tests share VolvoCars clients (one per API)
  * - **Single VIN Fetch**: Vehicle list is fetched only once for all tests
  * - **Parameterized Tests**: Tests run for ALL vehicles in the account
  *
@@ -26,12 +26,21 @@ import java.util.stream.Stream
  * Set credentials via environment variables:
  * ```
  * export VOLVO_API_KEY=your-vcc-api-key
- * export VOLVO_ACCESS_TOKEN=your-access-token
+ * export VOLVO_TOKEN_CONNECTED_VEHICLE=your-connected-vehicle-token
+ * export VOLVO_TOKEN_ENERGY=your-energy-token
+ * export VOLVO_TOKEN_LOCATION=your-location-token
  * ```
  *
  * Or via `local.properties` in the project root:
  * ```
  * volvo.apiKey=your-vcc-api-key
+ * volvo.token.connectedVehicle=your-connected-vehicle-token
+ * volvo.token.energy=your-energy-token
+ * volvo.token.location=your-location-token
+ * ```
+ *
+ * You can also use a single token for all APIs:
+ * ```
  * volvo.token=your-access-token
  * ```
  */
@@ -39,10 +48,22 @@ import java.util.stream.Stream
 abstract class BaseIntegrationTest {
 
     /**
-     * Returns the shared VolvoCars client.
+     * Returns the client for Connected Vehicle API.
      */
-    protected val client: VolvoCars
-        get() = SharedTestContext.client
+    protected val connectedVehicleClient: VolvoCars
+        get() = SharedTestContext.connectedVehicleClient
+
+    /**
+     * Returns the client for Energy API.
+     */
+    protected val energyClient: VolvoCars
+        get() = SharedTestContext.energyClient
+
+    /**
+     * Returns the client for Location API.
+     */
+    protected val locationClient: VolvoCars
+        get() = SharedTestContext.locationClient
 
     @BeforeAll
     fun checkSetup() {

@@ -24,7 +24,7 @@ class EnergyApiTest : BaseIntegrationTest() {
     @DisplayName("Get energy capabilities returns supported features")
     fun getCapabilities_returnsCapabilities(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Energy API") {
-            client.getCapabilities(vin)
+            energyClient.getCapabilities(vin)
         }
 
         logResponse("getCapabilities", vin, response)
@@ -37,7 +37,7 @@ class EnergyApiTest : BaseIntegrationTest() {
     @DisplayName("Get energy state returns current battery/charging state")
     fun getEnergyState_returnsState(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Energy API") {
-            client.getEnergyState(vin)
+            energyClient.getEnergyState(vin)
         }
 
         logResponse("getEnergyState", vin, response)
@@ -50,10 +50,10 @@ class EnergyApiTest : BaseIntegrationTest() {
     @DisplayName("Energy capabilities and state are consistent")
     fun capabilitiesAndState_areConsistent(vin: String) = runTest {
         val capabilities = runOrSkipOnPermissionDenied("Energy API") {
-            client.getCapabilities(vin)
+            energyClient.getCapabilities(vin)
         }
         val state = runOrSkipOnPermissionDenied("Energy API") {
-            client.getEnergyState(vin)
+            energyClient.getEnergyState(vin)
         }
 
         assertSuccessStatus(capabilities.status)
@@ -70,7 +70,7 @@ class EnergyApiTest : BaseIntegrationTest() {
     @DisplayName("Battery charge level is within valid range")
     fun batteryChargeLevel_isWithinValidRange(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Energy API") {
-            client.getEnergyState(vin)
+            energyClient.getEnergyState(vin)
         }
 
         logResponse("getEnergyState", vin, response)
@@ -88,7 +88,7 @@ class EnergyApiTest : BaseIntegrationTest() {
     @DisplayName("Electric range is non-negative")
     fun electricRange_isNonNegative(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Energy API") {
-            client.getEnergyState(vin)
+            energyClient.getEnergyState(vin)
         }
 
         logResponse("getEnergyState", vin, response)

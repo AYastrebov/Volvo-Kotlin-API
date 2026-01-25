@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
@@ -35,21 +36,31 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
     @DisplayName("Vehicle Information")
     inner class VehicleInformation {
 
-        @ParameterizedTest(name = "Get vehicle list contains VIN {0}")
-        @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
+        @Test
         @DisplayName("Get vehicle list returns user's vehicles")
-        fun getVehicleList_containsVin(vin: String) = runTest {
-            // This test verifies each VIN is in the list
-            // The actual API call is cached by SharedTestContext
-            val vins = SharedTestContext.vins
-            assertTrue(vin in vins, "VIN should be in the vehicle list")
+        fun getVehicleList_returnsVehicles() = runTest {
+            val response = runOrSkipOnPermissionDenied("Connected Vehicle API") {
+                connectedVehicleClient.getVehicleList()
+            }
+
+            println("[getVehicleList] Response: $response")
+            assertSuccessStatus(response.status)
+            assertNotNull(response.data, "Vehicle list should not be null")
+            assertTrue(response.data!!.isNotEmpty(), "Vehicle list should not be empty")
+
+            println("Found ${response.data!!.size} vehicle(s):")
+            response.data!!.forEach { vehicle ->
+                println("  - VIN: ${vehicle.vin}")
+            }
         }
 
         @ParameterizedTest(name = "Get vehicle details for VIN {0}")
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get vehicle details returns vehicle information")
         fun getVehicleDetails_returnsDetails(vin: String) = runTest {
-            val response = client.getVehicleDetails(vin)
+            val response = runOrSkipOnPermissionDenied("Connected Vehicle API") {
+                connectedVehicleClient.getVehicleDetails(vin)
+            }
 
             logResponse("getVehicleDetails", vin, response)
             assertSuccessStatus(response.status)
@@ -68,7 +79,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get window status returns window states")
         fun getWindowStatus_returnsStatus(vin: String) = runTest {
-            val response = client.getWindowStatus(vin)
+            val response = connectedVehicleClient.getWindowStatus(vin)
 
             logResponse("getWindowStatus", vin, response)
             assertSuccessStatus(response.status)
@@ -79,7 +90,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get door and lock status returns door states")
         fun getDoorAndLockStatus_returnsStatus(vin: String) = runTest {
-            val response = client.getDoorAndLockStatus(vin)
+            val response = connectedVehicleClient.getDoorAndLockStatus(vin)
 
             logResponse("getDoorAndLockStatus", vin, response)
             assertSuccessStatus(response.status)
@@ -90,7 +101,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get diagnostics returns diagnostic data")
         fun getDiagnostics_returnsData(vin: String) = runTest {
-            val response = client.getDiagnostics(vin)
+            val response = connectedVehicleClient.getDiagnostics(vin)
 
             logResponse("getDiagnostics", vin, response)
             assertSuccessStatus(response.status)
@@ -101,7 +112,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get warnings returns vehicle warnings")
         fun getWarnings_returnsWarnings(vin: String) = runTest {
-            val response = client.getWarnings(vin)
+            val response = connectedVehicleClient.getWarnings(vin)
 
             logResponse("getWarnings", vin, response)
             assertSuccessStatus(response.status)
@@ -112,7 +123,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get tyre status returns tyre pressure data")
         fun getTyreStatus_returnsStatus(vin: String) = runTest {
-            val response = client.getTyreStatus(vin)
+            val response = connectedVehicleClient.getTyreStatus(vin)
 
             logResponse("getTyreStatus", vin, response)
             assertSuccessStatus(response.status)
@@ -123,7 +134,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get engine status returns running state")
         fun getEngineStatus_returnsStatus(vin: String) = runTest {
-            val response = client.getEngineStatus(vin)
+            val response = connectedVehicleClient.getEngineStatus(vin)
 
             logResponse("getEngineStatus", vin, response)
             assertSuccessStatus(response.status)
@@ -134,7 +145,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get engine diagnostics returns diagnostic data")
         fun getEngineDiagnostics_returnsDiagnostics(vin: String) = runTest {
-            val response = client.getEngineDiagnostics(vin)
+            val response = connectedVehicleClient.getEngineDiagnostics(vin)
 
             logResponse("getEngineDiagnostics", vin, response)
             assertSuccessStatus(response.status)
@@ -145,7 +156,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get fuel amount returns fuel level")
         fun getFuelAmount_returnsAmount(vin: String) = runTest {
-            val response = client.getFuelAmount(vin)
+            val response = connectedVehicleClient.getFuelAmount(vin)
 
             logResponse("getFuelAmount", vin, response)
             assertSuccessStatus(response.status)
@@ -156,7 +167,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get odometer returns mileage")
         fun getOdometer_returnsMileage(vin: String) = runTest {
-            val response = client.getOdometer(vin)
+            val response = connectedVehicleClient.getOdometer(vin)
 
             logResponse("getOdometer", vin, response)
             assertSuccessStatus(response.status)
@@ -167,7 +178,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get statistics returns vehicle statistics")
         fun getStatistics_returnsStats(vin: String) = runTest {
-            val response = client.getStatistics(vin)
+            val response = connectedVehicleClient.getStatistics(vin)
 
             logResponse("getStatistics", vin, response)
             assertSuccessStatus(response.status)
@@ -178,7 +189,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @MethodSource("com.github.ayastrebov.volvo.api.integration.BaseIntegrationTest#allVins")
         @DisplayName("Get brake status returns brake state")
         fun getBrakeStatus_returnsStatus(vin: String) = runTest {
-            val response = client.getBrakeStatus(vin)
+            val response = connectedVehicleClient.getBrakeStatus(vin)
 
             logResponse("getBrakeStatus", vin, response)
             assertSuccessStatus(response.status)
@@ -197,7 +208,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Get command list returns available commands")
         fun getCommandList_returnsCommands(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Commands API") {
-                client.getCommandList(vin)
+                connectedVehicleClient.getCommandList(vin)
             }
 
             logResponse("getCommandList", vin, response)
@@ -210,7 +221,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Get command accessibility returns accessibility status")
         fun getCommandAccessibility_returnsAccessibility(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Commands API") {
-                client.getCommandAccessibility(vin)
+                connectedVehicleClient.getCommandAccessibility(vin)
             }
 
             logResponse("getCommandAccessibility", vin, response)
@@ -232,7 +243,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Invoke lock command sends lock request")
         fun invokeLock_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Lock command") {
-                client.invokeLock(vin)
+                connectedVehicleClient.invokeLock(vin)
             }
 
             logResponse("invokeLock", vin, response)
@@ -246,7 +257,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Invoke unlock command sends unlock request")
         fun invokeUnlock_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Unlock command") {
-                client.invokeUnlock(vin)
+                connectedVehicleClient.invokeUnlock(vin)
             }
 
             logResponse("invokeUnlock", vin, response)
@@ -260,7 +271,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Invoke honk command sends honk request")
         fun invokeHonk_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Honk command") {
-                client.invokeHonk(vin)
+                connectedVehicleClient.invokeHonk(vin)
             }
 
             logResponse("invokeHonk", vin, response)
@@ -274,7 +285,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Invoke flash command sends flash request")
         fun invokeFlash_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Flash command") {
-                client.invokeFlash(vin)
+                connectedVehicleClient.invokeFlash(vin)
             }
 
             logResponse("invokeFlash", vin, response)
@@ -288,7 +299,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Invoke honk and flash command sends combined request")
         fun invokeHonkFlash_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Honk and Flash command") {
-                client.invokeHonkFlash(vin)
+                connectedVehicleClient.invokeHonkFlash(vin)
             }
 
             logResponse("invokeHonkFlash", vin, response)
@@ -302,7 +313,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Invoke climatization start command sends start request")
         fun invokeClimatizationStart_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Climatization command") {
-                client.invokeClimatizationStart(vin)
+                connectedVehicleClient.invokeClimatizationStart(vin)
             }
 
             logResponse("invokeClimatizationStart", vin, response)
@@ -316,7 +327,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Invoke climatization stop command sends stop request")
         fun invokeClimatizationStop_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Climatization command") {
-                client.invokeClimatizationStop(vin)
+                connectedVehicleClient.invokeClimatizationStop(vin)
             }
 
             logResponse("invokeClimatizationStop", vin, response)
@@ -331,7 +342,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         fun invokeEngineStart_sendsCommand(vin: String) = runTest {
             val request = EngineStartRequest(runtimeMinutes = 5)
             val response = runOrSkipOnPermissionDenied("Engine command") {
-                client.invokeEngineStart(vin, request)
+                connectedVehicleClient.invokeEngineStart(vin, request)
             }
 
             logResponse("invokeEngineStart", vin, response)
@@ -345,7 +356,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Invoke engine stop command sends stop request")
         fun invokeEngineStop_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Engine command") {
-                client.invokeEngineStop(vin)
+                connectedVehicleClient.invokeEngineStop(vin)
             }
 
             logResponse("invokeEngineStop", vin, response)
@@ -359,7 +370,7 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
         @DisplayName("Invoke lock with reduced guard command sends request")
         fun invokeLockReducedGuard_sendsCommand(vin: String) = runTest {
             val response = runOrSkipOnPermissionDenied("Lock command") {
-                client.invokeLockReducedGuard(vin)
+                connectedVehicleClient.invokeLockReducedGuard(vin)
             }
 
             logResponse("invokeLockReducedGuard", vin, response)

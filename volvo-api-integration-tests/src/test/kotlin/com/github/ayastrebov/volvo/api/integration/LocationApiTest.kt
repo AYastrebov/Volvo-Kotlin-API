@@ -23,7 +23,7 @@ class LocationApiTest : BaseIntegrationTest() {
     @DisplayName("Get vehicle location returns GeoJSON Feature")
     fun getVehicleLocation_returnsLocation(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
-            client.getVehicleLocation(vin)
+            locationClient.getVehicleLocation(vin)
         }
 
         logResponse("getVehicleLocation", vin, response)
@@ -37,7 +37,7 @@ class LocationApiTest : BaseIntegrationTest() {
     @DisplayName("Location response contains geometry")
     fun locationResponse_containsGeometry(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
-            client.getVehicleLocation(vin)
+            locationClient.getVehicleLocation(vin)
         }
 
         logResponse("getVehicleLocation", vin, response)
@@ -51,7 +51,7 @@ class LocationApiTest : BaseIntegrationTest() {
     @DisplayName("Location coordinates are valid")
     fun locationCoordinates_areValid(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
-            client.getVehicleLocation(vin)
+            locationClient.getVehicleLocation(vin)
         }
 
         logResponse("getVehicleLocation", vin, response)
@@ -84,7 +84,7 @@ class LocationApiTest : BaseIntegrationTest() {
     @DisplayName("Location response contains properties")
     fun locationResponse_containsProperties(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
-            client.getVehicleLocation(vin)
+            locationClient.getVehicleLocation(vin)
         }
 
         logResponse("getVehicleLocation", vin, response)
@@ -106,7 +106,7 @@ class LocationApiTest : BaseIntegrationTest() {
     @DisplayName("Location heading is within valid range if present")
     fun locationHeading_isWithinValidRange(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
-            client.getVehicleLocation(vin)
+            locationClient.getVehicleLocation(vin)
         }
 
         logResponse("getVehicleLocation", vin, response)
@@ -127,7 +127,7 @@ class LocationApiTest : BaseIntegrationTest() {
     @DisplayName("Location timestamp is present if available")
     fun locationTimestamp_isPresent(vin: String) = runTest {
         val response = runOrSkipOnPermissionDenied("Location API") {
-            client.getVehicleLocation(vin)
+            locationClient.getVehicleLocation(vin)
         }
 
         logResponse("getVehicleLocation", vin, response)
