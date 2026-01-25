@@ -5,6 +5,7 @@ buildConfig = "6.0.7"
 caupain = "1.8.1"
 dokka = "2.1.0"
 kotlin = "2.3.0"
+maven-publish = "0.30.0"
 kotlinx-coroutines = "1.10.2"
 kotlinx-datetime = "0.7.1"
 kotlinx-serialization = "1.10.0"
@@ -52,4 +53,5 @@ caupain = { id = "com.deezer.caupain", version.ref = "caupain" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka"  }
 kotlinx-binary-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinx-binary-validator" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

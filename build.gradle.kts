@@ -1,10 +1,31 @@
 plugins {
     alias(libs.plugins.android.library).apply(false)
     alias(libs.plugins.buildConfig).apply(false)
-    alias(libs.plugins.dokka).apply(false)
+    alias(libs.plugins.dokka)
     alias(libs.plugins.kotlinx.serialization).apply(false)
     alias(libs.plugins.kotlinx.binary.validator) apply false
     alias(libs.plugins.multiplatform).apply(false)
 
     alias(libs.plugins.caupain)
+}
+
+// Dokka configuration for aggregated documentation
+dokka {
+    moduleName.set("Volvo Kotlin API")
+    moduleVersion.set(providers.gradleProperty("VolvoApiClientDeployVersion").orElse("0.0.1-SNAPSHOT"))
+
+    dokkaPublications.html {
+        outputDirectory.set(layout.buildDirectory.dir("dokka/html"))
+    }
+
+    pluginsConfiguration.html {
+        footerMessage.set("Volvo Kotlin API - MIT License")
+        homepageLink.set("https://github.com/AYastrebov/Volvo-Kotlin-API")
+    }
+}
+
+// Include subprojects in aggregated documentation
+dependencies {
+    dokka(project(":volvo-api-core"))
+    dokka(project(":volvo-api-client"))
 }
