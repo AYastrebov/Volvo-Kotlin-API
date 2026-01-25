@@ -117,7 +117,7 @@ object SharedTestContext {
             println("=".repeat(60))
 
         } catch (e: AuthenticationException) {
-            _initError = """
+            val errorMsg = """
                 |
                 |============================================================
                 |  AUTHENTICATION FAILED (401 Unauthorized)
@@ -135,6 +135,8 @@ object SharedTestContext {
                 |     export VOLVO_ACCESS_TOKEN=your-new-access-token
                 |============================================================
             """.trimMargin()
+            System.err.println(errorMsg)
+            _initError = errorMsg
             _client?.close()
             _client = null
         } catch (e: Exception) {
