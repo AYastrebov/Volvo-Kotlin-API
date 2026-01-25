@@ -36,6 +36,9 @@ fun getCredential(envVar: String, propertyKey: String): String {
 tasks.test {
     useJUnitPlatform()
 
+    // Disable caching - integration tests should always run fresh
+    outputs.upToDateWhen { false }
+
     // Pass system properties for credentials (VIN is fetched from API)
     systemProperty("volvo.apiKey", getCredential("VOLVO_API_KEY", "volvo.apiKey"))
     systemProperty("volvo.token", getCredential("VOLVO_ACCESS_TOKEN", "volvo.token"))
