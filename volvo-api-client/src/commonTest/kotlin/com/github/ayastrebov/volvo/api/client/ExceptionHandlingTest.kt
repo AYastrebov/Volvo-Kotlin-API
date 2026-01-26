@@ -102,6 +102,62 @@ class ExceptionHandlingTest {
         assertEquals("Too many requests. Please try again later", exception.error.detail?.message)
     }
 
+    @Test
+    fun httpStatus405_throwsInvalidRequestException() = runTest {
+        val client = createTestClientWithResponse(
+            ErrorFixtures.errorGeneric,
+            HttpStatusCode.MethodNotAllowed
+        )
+
+        val exception = assertFailsWith<InvalidRequestException> {
+            client.getVehicleList()
+        }
+
+        assertEquals(405, exception.statusCode)
+    }
+
+    @Test
+    fun httpStatus409_throwsInvalidRequestException() = runTest {
+        val client = createTestClientWithResponse(
+            ErrorFixtures.errorGeneric,
+            HttpStatusCode.Conflict
+        )
+
+        val exception = assertFailsWith<InvalidRequestException> {
+            client.getVehicleList()
+        }
+
+        assertEquals(409, exception.statusCode)
+    }
+
+    @Test
+    fun httpStatus415_throwsInvalidRequestException() = runTest {
+        val client = createTestClientWithResponse(
+            ErrorFixtures.errorGeneric,
+            HttpStatusCode.UnsupportedMediaType
+        )
+
+        val exception = assertFailsWith<InvalidRequestException> {
+            client.getVehicleList()
+        }
+
+        assertEquals(415, exception.statusCode)
+    }
+
+    @Test
+    fun httpStatus410_throwsInvalidRequestException() = runTest {
+        val client = createTestClientWithResponse(
+            ErrorFixtures.errorGeneric,
+            HttpStatusCode.Gone
+        )
+
+        val exception = assertFailsWith<InvalidRequestException> {
+            client.getVehicleList()
+        }
+
+        assertEquals(410, exception.statusCode)
+    }
+
     // ==================== Server Error Handling ====================
 
     @Test

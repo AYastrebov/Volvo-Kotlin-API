@@ -1,9 +1,10 @@
 package com.github.ayastrebov.volvo.api.core
 
+import com.github.ayastrebov.volvo.api.logging.HttpLogger
 import com.github.ayastrebov.volvo.api.logging.LogLevel
-import com.github.ayastrebov.volvo.api.logging.Logger
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
@@ -15,7 +16,7 @@ class LoggingConfigTest {
     fun defaultLoggingConfig_hasExpectedDefaults() {
         val config = LoggingConfig()
         assertEquals(LogLevel.Headers, config.logLevel)
-        assertEquals(Logger.Simple, config.logger)
+        assertNotNull(config.logger)
         assertTrue(config.sanitize)
     }
 
@@ -23,15 +24,16 @@ class LoggingConfigTest {
     fun loggingConfig_withCustomLogLevel() {
         val config = LoggingConfig(logLevel = LogLevel.Body)
         assertEquals(LogLevel.Body, config.logLevel)
-        assertEquals(Logger.Simple, config.logger)
+        assertNotNull(config.logger)
         assertTrue(config.sanitize)
     }
 
     @Test
     fun loggingConfig_withCustomLogger() {
-        val config = LoggingConfig(logger = Logger.Default)
+        val customLogger = HttpLogger { }
+        val config = LoggingConfig(logger = customLogger)
         assertEquals(LogLevel.Headers, config.logLevel)
-        assertEquals(Logger.Default, config.logger)
+        assertEquals(customLogger, config.logger)
         assertTrue(config.sanitize)
     }
 
@@ -39,19 +41,20 @@ class LoggingConfigTest {
     fun loggingConfig_withSanitizeDisabled() {
         val config = LoggingConfig(sanitize = false)
         assertEquals(LogLevel.Headers, config.logLevel)
-        assertEquals(Logger.Simple, config.logger)
+        assertNotNull(config.logger)
         assertEquals(false, config.sanitize)
     }
 
     @Test
     fun loggingConfig_withAllCustomValues() {
+        val customLogger = HttpLogger { }
         val config = LoggingConfig(
             logLevel = LogLevel.All,
-            logger = Logger.Empty,
+            logger = customLogger,
             sanitize = false
         )
         assertEquals(LogLevel.All, config.logLevel)
-        assertEquals(Logger.Empty, config.logger)
+        assertEquals(customLogger, config.logger)
         assertEquals(false, config.sanitize)
     }
 
@@ -59,5 +62,17 @@ class LoggingConfigTest {
     fun loggingConfig_logLevelNone_disablesLogging() {
         val config = LoggingConfig(logLevel = LogLevel.None)
         assertEquals(LogLevel.None, config.logLevel)
+    }
+
+    @Test
+    fun loggingConfig_withNoOpLogger() {
+        val config = LoggingConfig(logger = HttpLogger.NONE)
+        assertEquals(HttpLogger.NONE, config.logger)
+    }
+
+    @Test
+    fun loggingConfig_withSimpleLogger() {
+        val config = LoggingConfig(logger = HttpLogger.SIMPLE)
+        assertEquals(HttpLogger.SIMPLE, config.logger)
     }
 }

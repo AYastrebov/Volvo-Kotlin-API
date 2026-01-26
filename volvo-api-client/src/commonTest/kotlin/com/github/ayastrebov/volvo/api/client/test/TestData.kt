@@ -464,4 +464,13 @@ object ErrorFixtures {
             }
         }
     """.trimIndent()
+
+    val errorGeneric = """
+        {
+            "error": {
+                "code": "ERROR",
+                "message": "An error occurred"
+            }
+        }
+    """.trimIndent()
 }

@@ -12,3 +12,11 @@ import kotlinx.serialization.Serializable
 public data class EngineStartRequest(
     @SerialName("runtimeMinutes") val runtimeMinutes: Int
 )
+
+/**
+ * Empty request body for command invocations that require no parameters.
+ *
+ * Serializes to `{}` and ensures consistent serialization behavior across all command invocations.
+ */
+@Serializable
+public data object EmptyCommandRequest

@@ -8,8 +8,8 @@ import com.github.ayastrebov.volvo.api.core.LoggingConfig
 import com.github.ayastrebov.volvo.api.core.ProxyConfig
 import com.github.ayastrebov.volvo.api.core.RetryStrategy
 import com.github.ayastrebov.volvo.api.http.Timeout
+import com.github.ayastrebov.volvo.api.logging.HttpLogger
 import com.github.ayastrebov.volvo.api.logging.LogLevel
-import com.github.ayastrebov.volvo.api.logging.Logger
 import io.ktor.client.engine.mock.*
 import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
@@ -145,20 +145,21 @@ class HttpClientConfigTest {
     fun loggingConfig_hasDefaultValues() {
         val config = LoggingConfig()
 
-        assertEquals(Logger.Simple, config.logger)
+        assertNotNull(config.logger)
         assertEquals(LogLevel.Headers, config.logLevel)
         assertTrue(config.sanitize)
     }
 
     @Test
     fun loggingConfig_acceptsCustomValues() {
+        val customLogger = HttpLogger { }
         val config = LoggingConfig(
-            logger = Logger.Simple,
+            logger = customLogger,
             logLevel = LogLevel.All,
             sanitize = false
         )
 
-        assertEquals(Logger.Simple, config.logger)
+        assertEquals(customLogger, config.logger)
         assertEquals(LogLevel.All, config.logLevel)
         assertEquals(false, config.sanitize)
     }

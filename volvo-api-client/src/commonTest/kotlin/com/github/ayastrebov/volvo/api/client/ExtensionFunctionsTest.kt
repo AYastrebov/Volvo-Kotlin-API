@@ -3,19 +3,16 @@ package com.github.ayastrebov.volvo.api.client
 import com.github.ayastrebov.volvo.api.client.internal.extension.requestOptions
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogLevel
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogger
+import com.github.ayastrebov.volvo.api.core.LoggingConfig
 import com.github.ayastrebov.volvo.api.core.RequestOptions
 import com.github.ayastrebov.volvo.api.http.Timeout
+import com.github.ayastrebov.volvo.api.logging.HttpLogger
 import com.github.ayastrebov.volvo.api.logging.LogLevel
-import com.github.ayastrebov.volvo.api.logging.Logger
-import io.ktor.client.plugins.logging.DEFAULT
-import io.ktor.client.plugins.logging.EMPTY
-import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import io.ktor.client.plugins.logging.LogLevel as KtorLogLevel
 import io.ktor.client.plugins.logging.Logger as KtorLogger
@@ -25,27 +22,30 @@ import io.ktor.client.plugins.logging.Logger as KtorLogger
  */
 class ExtensionFunctionsTest {
 
-    // ==================== Logger Conversion ====================
+    // ==================== HttpLogger Conversion ====================
 
     @Test
-    fun loggerDefault_convertsToKtorLogger() {
-        val result = Logger.Default.toKtorLogger()
-        // Verify it returns a valid Ktor logger (DEFAULT is a function that returns new instances)
+    fun httpLoggerSimple_convertsToKtorLogger() {
+        val result = HttpLogger.SIMPLE.toKtorLogger()
         assertTrue(result is KtorLogger)
     }
 
     @Test
-    fun loggerSimple_convertsToKtorLogger() {
-        val result = Logger.Simple.toKtorLogger()
-        // Verify it returns a valid Ktor logger
+    fun httpLoggerNone_convertsToKtorLogger() {
+        val result = HttpLogger.NONE.toKtorLogger()
         assertTrue(result is KtorLogger)
     }
 
     @Test
-    fun loggerEmpty_convertsToKtorLogger() {
-        val result = Logger.Empty.toKtorLogger()
-        // Verify it returns a valid Ktor logger
-        assertTrue(result is KtorLogger)
+    fun customHttpLogger_convertsToKtorLogger() {
+        val messages = mutableListOf<String>()
+        val customLogger = HttpLogger { messages.add(it) }
+
+        val ktorLogger = customLogger.toKtorLogger()
+        ktorLogger.log("Test message")
+
+        assertEquals(1, messages.size)
+        assertEquals("Test message", messages.first())
     }
 
     // ==================== LogLevel Conversion ====================
@@ -220,5 +220,30 @@ class ExtensionFunctionsTest {
 
         assertEquals(mapOf("newKey" to "newValue"), copied.headers)
         assertEquals(mapOf("param" to "1"), copied.urlParameters)
+    }
+
+    // ==================== LoggingConfig ====================
+
+    @Test
+    fun loggingConfig_defaultLogger() {
+        val config = LoggingConfig()
+        assertNotNull(config.logger)
+    }
+
+    @Test
+    fun loggingConfig_customLogger() {
+        val messages = mutableListOf<String>()
+        val customLogger = HttpLogger { messages.add(it) }
+        val config = LoggingConfig(logger = customLogger)
+
+        config.logger.log("test")
+        assertEquals(listOf("test"), messages)
+    }
+
+    @Test
+    fun loggingConfig_noOpLogger() {
+        val config = LoggingConfig(logger = HttpLogger.NONE)
+        // Should not throw
+        config.logger.log("ignored")
     }
 }

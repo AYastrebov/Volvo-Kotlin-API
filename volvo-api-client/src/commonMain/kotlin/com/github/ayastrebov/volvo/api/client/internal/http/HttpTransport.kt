@@ -66,11 +66,10 @@ internal class HttpTransport(private val httpClient: HttpClient) : HttpRequester
      * Converts a [ClientRequestException] into a corresponding [VolvoAPIException] based on the HTTP status code.
      *
      * Status code mapping:
-     * - 400, 404, 409, 415 → [InvalidRequestException]
      * - 401 → [AuthenticationException]
      * - 403 → [PermissionException]
      * - 429 → [RateLimitException]
-     * - Other → [UnknownException]
+     * - Other 4xx → [InvalidRequestException]
      */
     private suspend fun volvoAPIException(exception: ClientRequestException): VolvoAPIException {
         val response = exception.response
@@ -80,12 +79,11 @@ internal class HttpTransport(private val httpClient: HttpClient) : HttpRequester
         } catch (e: Exception) {
             VolvoApiError(detail = VolvoErrorDetails(message = response.status.description))
         }
-        return when(status) {
-            429 -> RateLimitException(status, error, exception)
-            400, 404, 409, 415 -> InvalidRequestException(status, error, exception)
+        return when (status) {
             401 -> AuthenticationException(status, error, exception)
             403 -> PermissionException(status, error, exception)
-            else -> UnknownException(status, error, exception)
+            429 -> RateLimitException(status, error, exception)
+            else -> InvalidRequestException(status, error, exception)
         }
     }
 }

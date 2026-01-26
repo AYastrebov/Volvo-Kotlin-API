@@ -1,24 +1,21 @@
 package com.github.ayastrebov.volvo.api.client.internal.extension
 
+import com.github.ayastrebov.volvo.api.logging.HttpLogger
 import com.github.ayastrebov.volvo.api.logging.LogLevel
-import com.github.ayastrebov.volvo.api.logging.Logger
-import io.ktor.client.plugins.logging.DEFAULT
-import io.ktor.client.plugins.logging.EMPTY
-import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.plugins.logging.LogLevel as KLogLevel
 import io.ktor.client.plugins.logging.Logger as KLogger
 
 /**
- * Convert Logger to a Ktor's Logger.
+ * Convert [HttpLogger] to Ktor's Logger.
  */
-internal fun Logger.toKtorLogger() = when (this) {
-    Logger.Default -> KLogger.DEFAULT
-    Logger.Simple -> KLogger.SIMPLE
-    Logger.Empty -> KLogger.EMPTY
+internal fun HttpLogger.toKtorLogger(): KLogger = object : KLogger {
+    override fun log(message: String) {
+        this@toKtorLogger.log(message)
+    }
 }
 
 /**
- * Convert LogLevel to a Ktor's LogLevel.
+ * Convert LogLevel to Ktor's LogLevel.
  */
 internal fun LogLevel.toKtorLogLevel() = when (this) {
     LogLevel.All -> KLogLevel.ALL

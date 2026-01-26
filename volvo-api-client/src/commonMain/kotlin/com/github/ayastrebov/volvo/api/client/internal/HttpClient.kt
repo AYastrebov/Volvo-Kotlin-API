@@ -82,8 +82,8 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
 
         install(HttpRequestRetry) {
             maxRetries = config.retry.maxRetries
-            // retry on rate limit error.
-            retryIf { _, response -> response.status.value.let { it == 429 } }
+            // Retry on configured status codes (default: rate limit and transient server errors)
+            retryIf { _, response -> response.status.value in config.retry.retryOnStatusCodes }
             exponentialDelay(config.retry.base, config.retry.maxDelay.inWholeMilliseconds)
         }
 

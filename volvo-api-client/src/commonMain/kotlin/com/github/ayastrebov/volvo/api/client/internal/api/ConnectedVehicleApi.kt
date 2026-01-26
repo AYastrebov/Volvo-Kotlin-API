@@ -5,7 +5,25 @@ import com.github.ayastrebov.volvo.api.client.internal.extension.requestOptions
 import com.github.ayastrebov.volvo.api.client.internal.http.HttpRequester
 import com.github.ayastrebov.volvo.api.client.internal.http.perform
 import com.github.ayastrebov.volvo.api.core.RequestOptions
-import com.github.ayastrebov.volvo.api.model.connectedvehicle.*
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.CommandAccessibilityResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.CommandListResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.CommandResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.BrakeStatusResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.DiagnosticsResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.DoorAndLockStatusResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.EmptyCommandRequest
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.EngineDiagnosticsResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.EngineStartRequest
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.EngineStatusResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.FuelAmountResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.OdometerResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.StatisticsResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.TyreStatusResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.UnlockCommandResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.VehicleDetailsResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.VehicleListResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.WarningsResponse
+import com.github.ayastrebov.volvo.api.model.connectedvehicle.WindowStatusResponse
 import io.ktor.client.request.*
 import io.ktor.http.*
 
@@ -145,7 +163,7 @@ internal class ConnectedVehicleApi(private val requester: HttpRequester) : Conne
         return requester.perform {
             it.post("$BASE_PATH/$vin/commands/unlock") {
                 contentType(ContentType.Application.Json)
-                setBody("{}")
+                setBody(EmptyCommandRequest)
                 requestOptions(requestOptions)
             }
         }
@@ -155,7 +173,7 @@ internal class ConnectedVehicleApi(private val requester: HttpRequester) : Conne
         return requester.perform {
             it.post("$BASE_PATH/$vin/commands/lock") {
                 contentType(ContentType.Application.Json)
-                setBody("{}")
+                setBody(EmptyCommandRequest)
                 requestOptions(requestOptions)
             }
         }
@@ -165,7 +183,7 @@ internal class ConnectedVehicleApi(private val requester: HttpRequester) : Conne
         return requester.perform {
             it.post("$BASE_PATH/$vin/commands/honk") {
                 contentType(ContentType.Application.Json)
-                setBody("{}")
+                setBody(EmptyCommandRequest)
                 requestOptions(requestOptions)
             }
         }
@@ -175,7 +193,7 @@ internal class ConnectedVehicleApi(private val requester: HttpRequester) : Conne
         return requester.perform {
             it.post("$BASE_PATH/$vin/commands/flash") {
                 contentType(ContentType.Application.Json)
-                setBody("{}")
+                setBody(EmptyCommandRequest)
                 requestOptions(requestOptions)
             }
         }
@@ -185,7 +203,7 @@ internal class ConnectedVehicleApi(private val requester: HttpRequester) : Conne
         return requester.perform {
             it.post("$BASE_PATH/$vin/commands/honk-flash") {
                 contentType(ContentType.Application.Json)
-                setBody("{}")
+                setBody(EmptyCommandRequest)
                 requestOptions(requestOptions)
             }
         }
@@ -195,7 +213,7 @@ internal class ConnectedVehicleApi(private val requester: HttpRequester) : Conne
         return requester.perform {
             it.post("$BASE_PATH/$vin/commands/engine-stop") {
                 contentType(ContentType.Application.Json)
-                setBody("{}")
+                setBody(EmptyCommandRequest)
                 requestOptions(requestOptions)
             }
         }
@@ -219,7 +237,7 @@ internal class ConnectedVehicleApi(private val requester: HttpRequester) : Conne
         return requester.perform {
             it.post("$BASE_PATH/$vin/commands/climatization-stop") {
                 contentType(ContentType.Application.Json)
-                setBody("{}")
+                setBody(EmptyCommandRequest)
                 requestOptions(requestOptions)
             }
         }
@@ -229,7 +247,7 @@ internal class ConnectedVehicleApi(private val requester: HttpRequester) : Conne
         return requester.perform {
             it.post("$BASE_PATH/$vin/commands/climatization-start") {
                 contentType(ContentType.Application.Json)
-                setBody("{}")
+                setBody(EmptyCommandRequest)
                 requestOptions(requestOptions)
             }
         }
@@ -239,7 +257,7 @@ internal class ConnectedVehicleApi(private val requester: HttpRequester) : Conne
         return requester.perform {
             it.post("$BASE_PATH/$vin/commands/lock-reduced-guard") {
                 contentType(ContentType.Application.Json)
-                setBody("{}")
+                setBody(EmptyCommandRequest)
                 requestOptions(requestOptions)
             }
         }

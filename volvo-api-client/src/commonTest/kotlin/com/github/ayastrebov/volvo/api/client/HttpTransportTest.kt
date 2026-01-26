@@ -213,7 +213,7 @@ class HttpTransportTest {
     }
 
     @Test
-    fun unknownClientError_mapsToUnknownException() = runTest {
+    fun otherClientError_mapsToInvalidRequestException() = runTest {
         val mockEngine = MockEngine {
             respond(
                 content = """{"error": {"code": "UNKNOWN", "message": "Unknown error"}}""",
@@ -223,7 +223,8 @@ class HttpTransportTest {
         }
         val transport = createTransport(mockEngine)
 
-        val exception = assertFailsWith<UnknownException> {
+        // All other 4xx client errors should map to InvalidRequestException
+        val exception = assertFailsWith<InvalidRequestException> {
             transport.perform<String>(typeInfo<String>()) { it.get("https://api.test.com/test") }
         }
 
