@@ -200,30 +200,18 @@ export ORG_GRADLE_PROJECT_signingInMemoryKey=$(gpg --export-secret-keys YOUR_KEY
 
 ## Contributing
 
-Contributions are welcome! Here's how you can help:
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
+**Quick start:**
 
-### Guidelines
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes and add tests
+4. Ensure all tests pass: `./gradlew allTests`
+5. Open a Pull Request
 
-- Follow existing code style and conventions
-- Add tests for new functionality
-- Update documentation as needed
-- Ensure all tests pass before submitting: `./gradlew allTests`
-- Keep commits focused and atomic
-
-### Reporting Issues
-
-Found a bug or have a feature request? [Open an issue](../../issues) with:
-- Clear description of the problem or suggestion
-- Steps to reproduce (for bugs)
-- Expected vs actual behavior
-- Kotlin/platform version
+Found a bug or have a feature request? [Open an issue](../../issues).
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+MIT License. See [LICENSE](LICENSE.md) for details.
