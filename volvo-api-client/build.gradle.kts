@@ -63,7 +63,6 @@ kotlin {
             api(libs.ktor.client.core)
             api(projects.volvoApiCore)
 
-            implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.io.bytestring)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.auth)

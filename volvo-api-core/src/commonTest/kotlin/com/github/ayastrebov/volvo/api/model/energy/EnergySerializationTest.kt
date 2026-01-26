@@ -1,5 +1,6 @@
 package com.github.ayastrebov.volvo.api.model.energy
 
+import kotlin.time.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,7 +18,7 @@ class EnergySerializationTest {
         val original = ResourceResultString(
             status = "OK",
             value = "CHARGING",
-            updatedAt = "2024-01-15T10:30:00Z"
+            updatedAt = Instant.parse("2024-01-15T10:30:00Z")
         )
 
         val serialized = json.encodeToString(ResourceResultString.serializer(), original)
@@ -33,7 +34,7 @@ class EnergySerializationTest {
         val original = ResourceResultIntegerWithUnit(
             status = "OK",
             value = 350,
-            updatedAt = "2024-01-15T10:30:00Z",
+            updatedAt = Instant.parse("2024-01-15T10:30:00Z"),
             unit = "km"
         )
 
@@ -50,7 +51,7 @@ class EnergySerializationTest {
         val original = ResourceResultFloatWithUnit(
             status = "OK",
             value = 78.5f,
-            updatedAt = "2024-01-15T10:30:00Z",
+            updatedAt = Instant.parse("2024-01-15T10:30:00Z"),
             unit = "%"
         )
 

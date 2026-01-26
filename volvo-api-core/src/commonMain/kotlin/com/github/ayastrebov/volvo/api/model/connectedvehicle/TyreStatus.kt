@@ -1,5 +1,6 @@
 package com.github.ayastrebov.volvo.api.model.connectedvehicle
 
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -30,5 +31,5 @@ public data class TyreStatus(
 @Serializable
 public data class TyrePressureValue(
     @SerialName("value") val value: String? = null,
-    @SerialName("timestamp") val timestamp: String? = null
+    @SerialName("timestamp") val timestamp: Instant? = null
 )

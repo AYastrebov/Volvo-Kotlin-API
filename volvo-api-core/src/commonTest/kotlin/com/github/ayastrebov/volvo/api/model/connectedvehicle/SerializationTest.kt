@@ -1,6 +1,7 @@
 package com.github.ayastrebov.volvo.api.model.connectedvehicle
 
 import com.github.ayastrebov.volvo.api.model.common.ValueWithTimestamp
+import kotlin.time.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -55,7 +56,7 @@ class SerializationTest {
     fun valueWithTimestamp_serializesStringValue() {
         val original = ValueWithTimestamp(
             value = "RUNNING",
-            timestamp = "2024-01-15T10:30:00Z",
+            timestamp = Instant.parse("2024-01-15T10:30:00Z"),
             unit = null
         )
 
@@ -70,7 +71,7 @@ class SerializationTest {
     fun valueWithTimestamp_serializesIntValue() {
         val original = ValueWithTimestamp(
             value = 12500,
-            timestamp = "2024-01-15T10:30:00Z",
+            timestamp = Instant.parse("2024-01-15T10:30:00Z"),
             unit = "km"
         )
 
@@ -86,7 +87,7 @@ class SerializationTest {
     fun valueWithTimestamp_serializesDoubleValue() {
         val original = ValueWithTimestamp(
             value = 45.5,
-            timestamp = "2024-01-15T10:30:00Z",
+            timestamp = Instant.parse("2024-01-15T10:30:00Z"),
             unit = "liters"
         )
 

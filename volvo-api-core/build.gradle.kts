@@ -53,6 +53,7 @@ kotlin {
         commonMain.dependencies {
             api(libs.kotlinx.io.core)
             api(libs.kotlinx.serialization.json)
+            api(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.core)
         }
 
