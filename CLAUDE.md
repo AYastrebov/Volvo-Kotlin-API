@@ -126,7 +126,7 @@ volvo-api-client/src/
 │   ├── ExceptionHandlingTest.kt    # Exception mapping tests (17 tests)
 │   └── VolvoCarsConfigTest.kt      # Configuration tests (14 tests)
 └── jvmTest/kotlin/com/github/ayastrebov/volvo/api/client/
-    └── VolvoCarsIntegrationTest.kt # JVM integration tests (11 tests)
+    └── VolvoCarsClientTest.kt      # JVM client lifecycle tests (5 tests)
 ```
 
 ### Test Dependencies
@@ -147,8 +147,8 @@ volvo-api-client/src/
 | HTTP Transport | - | 17 |
 | HTTP Client Config | - | 18 |
 | Extension Functions | - | 17 |
-| Integration (JVM) | - | 11 |
-| **Total** | **29** | **135** |
+| Client (JVM) | - | 5 |
+| **Total** | **29** | **129** |
 
 ### Writing Tests
 
