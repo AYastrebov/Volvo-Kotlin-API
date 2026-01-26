@@ -1,5 +1,6 @@
 package com.github.ayastrebov.volvo.api.client.internal
 
+import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.client.VolvoCarsConfig
 import com.github.ayastrebov.volvo.api.core.ProxyConfig
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogLevel
@@ -36,6 +37,7 @@ import kotlin.time.DurationUnit
  * @param config The [VolvoCarsConfig] containing all client settings
  * @return Configured [HttpClient] instance
  */
+@InternalVolvoApi
 internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
     val configuration:  HttpClientConfig<*>.() -> Unit = {
         engine {
@@ -115,6 +117,7 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
  * - `isLenient = true`: Accepts non-standard JSON (e.g., unquoted strings, trailing commas)
  * - `ignoreUnknownKeys = true`: Allows API responses to include additional fields without causing deserialization errors
  */
+@InternalVolvoApi
 internal val JsonLenient = Json {
     isLenient = true
     ignoreUnknownKeys = true

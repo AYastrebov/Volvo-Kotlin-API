@@ -1,5 +1,6 @@
 package com.github.ayastrebov.volvo.api.client.internal.http
 
+import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -8,6 +9,7 @@ import io.ktor.util.reflect.*
 /**
  * Http request performer.
  */
+@InternalVolvoApi
 internal interface HttpRequester : AutoCloseable {
 
     /**
@@ -29,6 +31,7 @@ internal interface HttpRequester : AutoCloseable {
 /**
  * Perform an HTTP request and get a result
  */
+@InternalVolvoApi
 internal suspend inline fun <reified T> HttpRequester.perform(noinline block: suspend (HttpClient) -> HttpResponse): T {
     return perform(typeInfo<T>(), block)
 }

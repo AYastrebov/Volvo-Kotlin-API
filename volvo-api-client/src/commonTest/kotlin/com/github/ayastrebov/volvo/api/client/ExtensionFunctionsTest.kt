@@ -1,5 +1,8 @@
+@file:OptIn(InternalVolvoApi::class)
+
 package com.github.ayastrebov.volvo.api.client
 
+import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.client.internal.extension.requestOptions
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogLevel
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogger

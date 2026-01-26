@@ -1,5 +1,6 @@
 package com.github.ayastrebov.volvo.api.client.internal.http
 
+import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.exception.*
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -12,6 +13,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.io.IOException
 
 /** HTTP transport layer */
+@InternalVolvoApi
 internal class HttpTransport(private val httpClient: HttpClient) : HttpRequester {
 
     /** Perform an HTTP request and get a result */

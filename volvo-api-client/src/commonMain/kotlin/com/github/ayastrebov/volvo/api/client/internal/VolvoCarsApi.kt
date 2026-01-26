@@ -1,5 +1,6 @@
 package com.github.ayastrebov.volvo.api.client.internal
 
+import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.api.ConnectedVehicle
 import com.github.ayastrebov.volvo.api.api.Energy
 import com.github.ayastrebov.volvo.api.api.ExtendedVehicle
@@ -16,6 +17,7 @@ import com.github.ayastrebov.volvo.api.client.internal.http.HttpRequester
  *
  * @param requester http transport layer
  */
+@InternalVolvoApi
 internal class VolvoCarsApi(
     private val requester: HttpRequester
 ) : VolvoCars,

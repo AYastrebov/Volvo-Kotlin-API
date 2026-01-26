@@ -1,5 +1,8 @@
+@file:OptIn(InternalVolvoApi::class)
+
 package com.github.ayastrebov.volvo.api.client
 
+import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.client.internal.http.HttpTransport
 import com.github.ayastrebov.volvo.api.exception.*
 import io.ktor.client.*
