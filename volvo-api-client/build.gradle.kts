@@ -107,7 +107,6 @@ buildConfig {
 }
 
 mavenPublishing {
-    publishToMavenCentral(automaticRelease = true)
     signAllPublications()
 
     coordinates(

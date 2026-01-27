@@ -24,9 +24,6 @@ Kotlin Multiplatform library for Volvo Vehicle APIs (Connected Vehicle, Energy, 
 
 # Publish to GitHub Packages
 ./gradlew publishAllPublicationsToGitHubPackagesRepository
-
-# Publish to Maven Central
-./gradlew publishAllPublicationsToMavenCentralRepository
 ```
 
 ## Project Structure
@@ -215,6 +212,9 @@ Set credentials via environment variables (recommended for CI):
 ```bash
 export GITHUB_ACTOR=your-github-username
 export GITHUB_TOKEN=your-github-token
+export ORG_GRADLE_PROJECT_signingInMemoryKeyId=YOUR_KEY_ID
+export ORG_GRADLE_PROJECT_signingInMemoryKeyPassword=your-key-password
+export ORG_GRADLE_PROJECT_signingInMemoryKey=$(base64 < ~/.gnupg/secring.gpg)
 ./gradlew publishAllPublicationsToGitHubPackagesRepository
 ```
 
@@ -224,16 +224,11 @@ gpr.user=your-github-username
 gpr.token=your-github-token
 ```
 
-### Maven Central
+### Maven Local
 
-Set credentials via environment variables:
+Publish to local Maven repository (no signing required):
 ```bash
-export ORG_GRADLE_PROJECT_mavenCentralUsername=your-sonatype-username
-export ORG_GRADLE_PROJECT_mavenCentralPassword=your-sonatype-password
-export ORG_GRADLE_PROJECT_signingInMemoryKeyId=YOUR_KEY_ID
-export ORG_GRADLE_PROJECT_signingInMemoryKeyPassword=your-key-password
-export ORG_GRADLE_PROJECT_signingInMemoryKey=$(base64 < ~/.gnupg/secring.gpg)
-./gradlew publishAllPublicationsToMavenCentralRepository
+./gradlew publishToMavenLocal
 ```
 
 ### Version Override
