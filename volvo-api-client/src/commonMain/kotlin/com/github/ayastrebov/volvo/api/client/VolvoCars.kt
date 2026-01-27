@@ -16,6 +16,25 @@ import kotlin.time.Duration.Companion.seconds
 
 public interface VolvoCars: ExtendedVehicle, ConnectedVehicle, Location, Energy, AutoCloseable
 
+/**
+ * Creates an instance of [VolvoCars] with individual configuration parameters.
+ *
+ * This factory function provides a convenient way to create a Volvo API client
+ * without manually constructing a [VolvoCarsConfig] object.
+ *
+ * @param apiKey The VCC API key obtained from the Volvo developer portal
+ * @param token The OAuth2 access token for authenticating API requests
+ * @param logging Configuration for HTTP request/response logging (default: no logging)
+ * @param timeout Timeout configuration for HTTP requests (default: 30 seconds socket timeout)
+ * @param headers Additional HTTP headers to include in all requests
+ * @param proxy Optional proxy configuration for HTTP requests
+ * @param retry Retry strategy configuration for failed requests (default: no retries)
+ * @param httpClientConfig Additional Ktor HttpClient configuration block
+ * @return A configured [VolvoCars] instance ready for API calls
+ *
+ * @see VolvoCars Overload accepting [VolvoCarsConfig] for more complex configurations
+ * @see VolvoCarsConfig For detailed configuration options
+ */
 public fun VolvoCars(
     apiKey: String,
     token: String,

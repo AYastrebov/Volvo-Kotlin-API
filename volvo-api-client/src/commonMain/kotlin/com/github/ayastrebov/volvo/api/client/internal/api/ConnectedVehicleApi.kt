@@ -29,6 +29,20 @@ import io.ktor.http.*
 
 private const val BASE_PATH = "connected-vehicle/v2/vehicles"
 
+/**
+ * Implementation of the [ConnectedVehicle] API interface.
+ *
+ * This class provides access to the Connected Vehicle API v2 endpoints, enabling:
+ * - Vehicle information retrieval (list, details)
+ * - Status data queries (windows, doors, tyres, fuel, odometer, etc.)
+ * - Remote command invocations (lock, unlock, honk, flash, climatization, engine control)
+ *
+ * All methods delegate HTTP operations to the shared [HttpRequester] and apply
+ * optional [RequestOptions] for per-request customization of headers, timeouts, and retries.
+ *
+ * @param requester The HTTP transport layer for executing API requests
+ * @see ConnectedVehicle For the public interface definition and method documentation
+ */
 internal class ConnectedVehicleApi(private val requester: HttpRequester) : ConnectedVehicle {
 
     // ==================== Vehicle Information ====================
