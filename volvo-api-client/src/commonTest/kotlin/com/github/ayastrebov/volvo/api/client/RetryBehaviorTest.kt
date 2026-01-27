@@ -1,8 +1,5 @@
-@file:OptIn(InternalVolvoApi::class)
-
 package com.github.ayastrebov.volvo.api.client
 
-import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.client.internal.createHttpClient
 import com.github.ayastrebov.volvo.api.core.RetryStrategy
 import io.ktor.client.engine.mock.*

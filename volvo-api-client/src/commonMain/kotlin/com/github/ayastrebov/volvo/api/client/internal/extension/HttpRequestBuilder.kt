@@ -1,6 +1,5 @@
 package com.github.ayastrebov.volvo.api.client.internal.extension
 
-import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.core.RequestOptions
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -8,7 +7,6 @@ import io.ktor.client.request.*
 /**
  * Apply request options to the request builder.
  */
-@InternalVolvoApi
 internal fun HttpRequestBuilder.requestOptions(requestOptions: RequestOptions? = null) {
     if (requestOptions == null) return
     requestOptions.headers.forEach { (key, value) ->

@@ -56,11 +56,6 @@ Before contributing, please familiarize yourself with:
 - Platform-specific implementations go in `jvmMain`, `androidMain`, `iosMain`, etc.
 - Use `expect`/`actual` declarations for platform-specific behavior
 
-### Annotations
-
-- **`@VolvoApiDsl`** — Mark DSL builder classes for type-safe builders
-- **`@InternalVolvoApi`** — Mark internal APIs not intended for public use
-
 ### Explicit API Mode
 
 This project uses Kotlin's explicit API mode. All public declarations must have:

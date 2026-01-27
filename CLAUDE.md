@@ -42,7 +42,7 @@ Kotlin Multiplatform library for Volvo Vehicle APIs (Connected Vehicle, Energy, 
 ## Architecture
 
 ### Modules
-- **volvo-api-core**: Public interfaces, DSL markers, exception hierarchy, request options
+- **volvo-api-core**: Public interfaces, exception hierarchy, request options
 - **volvo-api-client**: Implementation using Ktor client with multiplatform support
 
 ### Target Platforms
@@ -55,7 +55,7 @@ Android, JVM, iOS (x64, arm64, simulator), macOS, Linux, Windows, JS (Node.js), 
 - `com.github.ayastrebov.volvo.api.client.internal.http` - HTTP transport layer
 
 ### Key Packages (volvo-api-core)
-- `com.github.ayastrebov.volvo.api` - DSL markers and public interfaces
+- `com.github.ayastrebov.volvo.api` - Public API interfaces
 - `com.github.ayastrebov.volvo.api.core` - RequestOptions
 - `com.github.ayastrebov.volvo.api.exception` - Exception hierarchy
 - `com.github.ayastrebov.volvo.api.logging` - Logger configuration
@@ -74,9 +74,8 @@ Base URL: `https://api.volvocars.com`
 
 - Kotlin Multiplatform with `commonMain` source set for shared code
 - Platform-specific implementations in `jvmMain`, `androidMain`, etc.
-- DSL markers (`@VolvoApiDsl`, etc.) for type-safe builders
 - Explicit API mode enabled for public API verification
-- Internal classes/functions annotated with `@InternalVolvoApi`
+- Internal classes/functions use Kotlin's `internal` visibility modifier
 
 ### Exception Handling
 Typed exceptions in `com.github.ayastrebov.volvo.api.exception`:

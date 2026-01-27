@@ -1,8 +1,5 @@
-@file:OptIn(InternalVolvoApi::class)
-
 package com.github.ayastrebov.volvo.api.client
 
-import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.api.ConnectedVehicle
 import com.github.ayastrebov.volvo.api.api.Energy
 import com.github.ayastrebov.volvo.api.api.ExtendedVehicle

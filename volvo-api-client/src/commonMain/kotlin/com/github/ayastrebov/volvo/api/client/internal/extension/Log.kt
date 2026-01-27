@@ -1,6 +1,5 @@
 package com.github.ayastrebov.volvo.api.client.internal.extension
 
-import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.logging.HttpLogger
 import com.github.ayastrebov.volvo.api.logging.LogLevel
 import io.ktor.client.plugins.logging.LogLevel as KLogLevel
@@ -9,7 +8,6 @@ import io.ktor.client.plugins.logging.Logger as KLogger
 /**
  * Convert [HttpLogger] to Ktor's Logger.
  */
-@InternalVolvoApi
 internal fun HttpLogger.toKtorLogger(): KLogger = object : KLogger {
     override fun log(message: String) {
         this@toKtorLogger.log(message)
@@ -19,7 +17,6 @@ internal fun HttpLogger.toKtorLogger(): KLogger = object : KLogger {
 /**
  * Convert LogLevel to Ktor's LogLevel.
  */
-@InternalVolvoApi
 internal fun LogLevel.toKtorLogLevel() = when (this) {
     LogLevel.All -> KLogLevel.ALL
     LogLevel.Headers -> KLogLevel.HEADERS

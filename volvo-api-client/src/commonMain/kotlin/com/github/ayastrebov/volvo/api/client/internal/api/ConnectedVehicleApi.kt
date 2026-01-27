@@ -1,6 +1,5 @@
 package com.github.ayastrebov.volvo.api.client.internal.api
 
-import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.api.ConnectedVehicle
 import com.github.ayastrebov.volvo.api.client.internal.extension.requestOptions
 import com.github.ayastrebov.volvo.api.client.internal.http.HttpRequester
@@ -30,7 +29,6 @@ import io.ktor.http.*
 
 private const val BASE_PATH = "connected-vehicle/v2/vehicles"
 
-@InternalVolvoApi
 internal class ConnectedVehicleApi(private val requester: HttpRequester) : ConnectedVehicle {
 
     // ==================== Vehicle Information ====================

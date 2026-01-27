@@ -1,6 +1,5 @@
 package com.github.ayastrebov.volvo.api.client.internal.extension
 
-import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.client.internal.JsonLenient
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
@@ -15,7 +14,6 @@ private const val STREAM_END_TOKEN = "$STREAM_PREFIX [DONE]"
 /**
  * Get data as [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#Event_stream_format).
  */
-@InternalVolvoApi
 internal suspend inline fun <reified T> FlowCollector<T>.streamEventsFrom(response: HttpResponse) {
     val channel: ByteReadChannel = response.body()
     try {

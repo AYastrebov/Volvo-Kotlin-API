@@ -1,6 +1,5 @@
 package com.github.ayastrebov.volvo.api.client.internal.api
 
-import com.github.ayastrebov.volvo.api.InternalVolvoApi
 import com.github.ayastrebov.volvo.api.api.Energy
 import com.github.ayastrebov.volvo.api.client.internal.extension.requestOptions
 import com.github.ayastrebov.volvo.api.client.internal.http.HttpRequester
@@ -12,7 +11,6 @@ import io.ktor.client.request.*
 
 private const val BASE_PATH = "energy/v2/vehicles"
 
-@InternalVolvoApi
 internal class EnergyApi(private val requester: HttpRequester) : Energy {
 
     override suspend fun getCapabilities(vin: String, requestOptions: RequestOptions?): CapabilitiesResponse {
