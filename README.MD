@@ -19,10 +19,10 @@
 ## Features
 
 - **Multiplatform** — Write once, run on Android, JVM, iOS, macOS, Linux, Windows, JS, and WebAssembly
-- **Complete API Coverage** — Connected Vehicle, Energy, Extended Vehicle, and Location APIs
+- **Complete API Coverage** — Connected Vehicle, Energy, and Location APIs
 - **Type-Safe** — Kotlin data classes for all request/response models with compile-time safety
 - **Coroutine-Based** — Fully asynchronous with Kotlin coroutines
-- **Well-Tested** — 135+ unit tests with mocked HTTP responses + integration tests against real API
+- **Well-Tested** — 160+ unit tests with mocked HTTP responses + integration tests against real API
 
 ## Installation
 
@@ -85,12 +85,9 @@ client.close()
 
 | API | Description | Endpoints |
 |-----|-------------|-----------|
-| Connected Vehicle | Vehicle info, commands, diagnostics | 26 |
+| Connected Vehicle | Vehicle info, commands, diagnostics | 25 |
 | Energy | Battery state, charging | 2 |
 | Location | GPS location | 1 |
-| Extended Vehicle | Resources, subscriptions | — |
-
-> **Note:** Extended Vehicle API is deprecated by Volvo and will be removed in a future release. Use Connected Vehicle API instead.
 
 **Base URL:** `https://api.volvocars.com`
 
@@ -177,17 +174,6 @@ Or set in `local.properties`:
 ```properties
 gpr.user=your-github-username
 gpr.token=your-github-token
-```
-
-### Publish to Maven Central
-
-```bash
-export ORG_GRADLE_PROJECT_mavenCentralUsername=your-sonatype-username
-export ORG_GRADLE_PROJECT_mavenCentralPassword=your-sonatype-password
-export ORG_GRADLE_PROJECT_signingInMemoryKeyId=YOUR_KEY_ID
-export ORG_GRADLE_PROJECT_signingInMemoryKeyPassword=your-key-password
-export ORG_GRADLE_PROJECT_signingInMemoryKey=$(gpg --export-secret-keys YOUR_KEY_ID | base64)
-./gradlew publishAllPublicationsToMavenCentralRepository
 ```
 
 ### Version Override

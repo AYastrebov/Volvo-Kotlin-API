@@ -2,7 +2,6 @@ package com.github.ayastrebov.volvo.api.client
 
 import com.github.ayastrebov.volvo.api.api.ConnectedVehicle
 import com.github.ayastrebov.volvo.api.api.Energy
-import com.github.ayastrebov.volvo.api.api.ExtendedVehicle
 import com.github.ayastrebov.volvo.api.api.Location
 import com.github.ayastrebov.volvo.api.client.test.*
 import io.ktor.http.*
@@ -122,7 +121,6 @@ class VolvoCarsClientTest {
         assertTrue(client is ConnectedVehicle)
         assertTrue(client is Energy)
         assertTrue(client is Location)
-        assertTrue(client is ExtendedVehicle)
         assertTrue(client is AutoCloseable)
 
         client.close()

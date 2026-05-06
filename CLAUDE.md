@@ -1,6 +1,6 @@
 # Volvo Kotlin API
 
-Kotlin Multiplatform library for Volvo Vehicle APIs (Connected Vehicle, Energy, Extended Vehicle, Location).
+Kotlin Multiplatform library for Volvo Vehicle APIs (Connected Vehicle, Energy, Location).
 
 ## Build Commands
 
@@ -62,7 +62,6 @@ Android, JVM, iOS (x64, arm64, simulator), macOS, Linux, Windows, JS (Node.js), 
 |-----|------|
 | Connected Vehicle | `connected-vehicle/v2/vehicles` |
 | Energy | `energy/v2/vehicles` |
-| Extended Vehicle | `extended-vehicle/v1/vehicles` |
 | Location | `location/v1/vehicles` |
 
 Base URL: `https://api.volvocars.com`
@@ -113,14 +112,16 @@ volvo-api-client/src/
 │   │   ├── MockHttpEngine.kt       # Mock HTTP engine utilities
 │   │   ├── TestClientFactory.kt    # Test client factory functions
 │   │   └── TestData.kt             # Test fixtures and constants
-│   ├── ConnectedVehicleApiTest.kt  # Connected Vehicle API tests (27 tests)
-│   ├── EnergyApiTest.kt            # Energy API tests (8 tests)
-│   ├── ExtensionFunctionsTest.kt   # Extension function tests (17 tests)
-│   ├── HttpClientConfigTest.kt     # HTTP client config tests (18 tests)
+│   ├── ConnectedVehicleApiTest.kt  # Connected Vehicle API tests (28 tests)
+│   ├── EnergyApiTest.kt            # Energy API tests (7 tests)
+│   ├── ExceptionHandlingTest.kt    # Exception mapping tests (23 tests)
+│   ├── ExtensionFunctionsTest.kt   # Extension function tests (21 tests)
+│   ├── HttpClientConfigTest.kt     # HTTP client config tests (17 tests)
 │   ├── HttpTransportTest.kt        # HTTP transport tests (17 tests)
 │   ├── LocationApiTest.kt          # Location API tests (6 tests)
-│   ├── ExceptionHandlingTest.kt    # Exception mapping tests (17 tests)
-│   └── VolvoCarsConfigTest.kt      # Configuration tests (14 tests)
+│   ├── RetryBehaviorTest.kt        # Retry logic tests (12 tests)
+│   ├── TimeoutBehaviorTest.kt      # Timeout handling tests (13 tests)
+│   └── VolvoCarsConfigTest.kt      # Configuration tests (12 tests)
 └── jvmTest/kotlin/com/github/ayastrebov/volvo/api/client/
     └── VolvoCarsClientTest.kt      # JVM client lifecycle tests (5 tests)
 ```
@@ -135,16 +136,18 @@ volvo-api-client/src/
 
 | API | Endpoints | Tests |
 |-----|-----------|-------|
-| Connected Vehicle | 26 | 27 |
-| Energy | 2 | 8 |
+| Connected Vehicle | 25 | 28 |
+| Energy | 2 | 7 |
 | Location | 1 | 6 |
-| Exception Handling | - | 17 |
-| Configuration | - | 14 |
+| Exception Handling | - | 23 |
+| Configuration | - | 12 |
 | HTTP Transport | - | 17 |
-| HTTP Client Config | - | 18 |
-| Extension Functions | - | 17 |
+| HTTP Client Config | - | 17 |
+| Extension Functions | - | 21 |
+| Retry Behavior | - | 12 |
+| Timeout Behavior | - | 13 |
 | Client (JVM) | - | 5 |
-| **Total** | **29** | **129** |
+| **Total** | **28** | **161** |
 
 ### Writing Tests
 

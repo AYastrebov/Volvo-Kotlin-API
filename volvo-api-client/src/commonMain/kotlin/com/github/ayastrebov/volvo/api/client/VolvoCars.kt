@@ -2,7 +2,6 @@ package com.github.ayastrebov.volvo.api.client
 
 import com.github.ayastrebov.volvo.api.api.ConnectedVehicle
 import com.github.ayastrebov.volvo.api.api.Energy
-import com.github.ayastrebov.volvo.api.api.ExtendedVehicle
 import com.github.ayastrebov.volvo.api.api.Location
 import com.github.ayastrebov.volvo.api.client.internal.VolvoCarsApi
 import com.github.ayastrebov.volvo.api.client.internal.createHttpClient
@@ -14,7 +13,7 @@ import com.github.ayastrebov.volvo.api.http.Timeout
 import io.ktor.client.*
 import kotlin.time.Duration.Companion.seconds
 
-public interface VolvoCars: ExtendedVehicle, ConnectedVehicle, Location, Energy, AutoCloseable
+public interface VolvoCars: ConnectedVehicle, Location, Energy, AutoCloseable
 
 /**
  * Creates an instance of [VolvoCars] with individual configuration parameters.

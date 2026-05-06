@@ -40,6 +40,5 @@ When using test tokens, you can access a Demo Test Vehicle to experiment with AP
 Each API provides a sandbox environment for testing:
 - Connected Vehicle API
 - Energy API
-- Extended Vehicle API
 
 You can test functionality using your own Volvo ID account or a demo Volvo ID account.

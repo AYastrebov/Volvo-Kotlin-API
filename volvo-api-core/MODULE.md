@@ -4,14 +4,14 @@ Core module for the Volvo Kotlin API library containing public interfaces, data 
 
 This module provides the foundational types used by the Volvo API client:
 
-- API Interfaces for Connected Vehicle, Energy, Extended Vehicle, and Location APIs
+- API Interfaces for Connected Vehicle, Energy, and Location APIs
 - Data Models for request and response handling
 - Exception Hierarchy for typed error scenarios (RateLimitException, AuthenticationException, PermissionException, InvalidRequestException, VolvoServerException)
 - Configuration for logging, proxy, retry, and timeout settings
 
 # Package com.github.ayastrebov.volvo.api.api
 
-Public API interfaces defining available operations for Volvo vehicle APIs including ConnectedVehicle, Energy, ExtendedVehicle, and Location.
+Public API interfaces defining available operations for Volvo vehicle APIs including ConnectedVehicle, Energy, and Location.
 
 # Package com.github.ayastrebov.volvo.api.core
 

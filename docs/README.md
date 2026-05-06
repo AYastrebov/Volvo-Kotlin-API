@@ -13,7 +13,6 @@ This documentation covers the Volvo Cars APIs available through the [Volvo Cars 
 - **[Connected Vehicle API](connected-vehicle-api/README.md)** - Vehicle data and remote commands
 - **[Energy API](energy-api/README.md)** - Electric/hybrid vehicle energy state
 - **[Location API](location-api/README.md)** - Vehicle location data
-- **[Extended Vehicle API](extended-vehicle-api/README.md)** - *(Deprecated)* ISO 20078-1 implementation
 
 ## Quick Reference
 
@@ -22,7 +21,6 @@ This documentation covers the Volvo Cars APIs available through the [Volvo Cars 
 | Connected Vehicle | `connected-vehicle/v2/vehicles` | v2 |
 | Energy | `energy/v2/vehicles` | v2 |
 | Location | `location/v1/vehicles` | v1 |
-| Extended Vehicle | `extended-vehicle/v1/vehicles` | v1 (Deprecated) |
 
 **Base URL**: `https://api.volvocars.com`
 

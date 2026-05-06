@@ -102,7 +102,6 @@ buildConfig {
     buildConfigField("API_URL", "https://api.volvocars.com")
     buildConfigField("CONNECTED_VEHICLE_API", "connected-vehicle/v2/vehicles")
     buildConfigField("ENERGY_API", "energy/v2/vehicles")
-    buildConfigField("EXTENDED_VEHICLE_API", "extended-vehicle/v1/vehicles")
     buildConfigField("LOCATION_API", "location/v1/vehicles")
 }
 

@@ -12,4 +12,4 @@ Supported platforms: JVM, Android, iOS, macOS, Linux, Windows, JavaScript (Node.
 
 # Package com.github.ayastrebov.volvo.api.client
 
-Main client classes for interacting with Volvo APIs. Contains VolvoCars (the main API client implementing ConnectedVehicle, Energy, ExtendedVehicle, and Location interfaces) and VolvoCarsConfig (client configuration with support for logging, timeouts, retry, and proxy).
+Main client classes for interacting with Volvo APIs. Contains VolvoCars (the main API client implementing ConnectedVehicle, Energy, and Location interfaces) and VolvoCarsConfig (client configuration with support for logging, timeouts, retry, and proxy).
