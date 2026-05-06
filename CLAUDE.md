@@ -43,7 +43,7 @@ Kotlin Multiplatform library for Volvo Vehicle APIs (Connected Vehicle, Energy, 
 - **volvo-api-client**: Implementation using Ktor client with multiplatform support
 
 ### Target Platforms
-Android, JVM, iOS (x64, arm64, simulator), macOS, Linux, Windows, JS (Node.js), Wasm
+Android, JVM, iOS (arm64, simulator), macOS (arm64), Linux, Windows, JS (Node.js), Wasm
 
 ### Key Packages (volvo-api-client)
 - `com.github.ayastrebov.volvo.api.client` - Public API (VolvoCars, VolvoCarsConfig)

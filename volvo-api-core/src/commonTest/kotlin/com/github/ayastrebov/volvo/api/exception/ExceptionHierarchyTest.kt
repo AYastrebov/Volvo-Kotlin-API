@@ -1,6 +1,7 @@
 package com.github.ayastrebov.volvo.api.exception
 
 import kotlin.test.Test
+import kotlin.test.assertIs
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -12,8 +13,8 @@ class ExceptionHierarchyTest {
 
     @Test
     fun volvoHttpException_extendsVolvoException() {
-        val exception = VolvoHttpException(RuntimeException("Test error"))
-        assertTrue(exception is VolvoException)
+        val exception: Any = VolvoHttpException(RuntimeException("Test error"))
+        assertIs<VolvoException>(exception)
     }
 
     @Test
@@ -27,8 +28,8 @@ class ExceptionHierarchyTest {
 
     @Test
     fun volvoServerException_extendsVolvoException() {
-        val exception = VolvoServerException(RuntimeException("Server error"))
-        assertTrue(exception is VolvoException)
+        val exception: Any = VolvoServerException(RuntimeException("Server error"))
+        assertIs<VolvoException>(exception)
     }
 
     @Test

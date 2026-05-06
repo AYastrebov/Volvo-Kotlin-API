@@ -76,8 +76,9 @@ class LocationSerializationTest {
 
         assertEquals(original.type, deserialized.type)
         assertEquals(original.properties?.get("timestamp"), deserialized.properties?.get("timestamp"))
-        assertNotNull(deserialized.geometry)
-        assertEquals(original.geometry?.longitude, deserialized.geometry?.longitude)
+        val geometry = deserialized.geometry
+        assertNotNull(geometry)
+        assertEquals(original.geometry?.longitude, geometry.longitude)
     }
 
     @Test

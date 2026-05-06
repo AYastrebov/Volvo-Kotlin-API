@@ -3,6 +3,7 @@ package com.github.ayastrebov.volvo.api.model.energy
 import kotlin.time.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
+import kotlin.test.assertNotNull
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -103,8 +104,10 @@ class EnergySerializationTest {
         val serialized = json.encodeToString(Capabilities.serializer(), original)
         val deserialized = json.decodeFromString(Capabilities.serializer(), serialized)
 
-        assertTrue(deserialized.getEnergyState?.isSupported == true)
-        assertTrue(deserialized.getEnergyState?.batteryChargeLevel?.isSupported == true)
+        val energyState = deserialized.getEnergyState
+        assertNotNull(energyState)
+        assertTrue(energyState.isSupported == true)
+        assertTrue(energyState.batteryChargeLevel?.isSupported == true)
     }
 
     @Test

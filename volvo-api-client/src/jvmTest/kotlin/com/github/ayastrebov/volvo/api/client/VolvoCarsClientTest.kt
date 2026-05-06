@@ -7,6 +7,7 @@ import com.github.ayastrebov.volvo.api.client.test.*
 import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -76,7 +77,7 @@ class VolvoCarsClientTest {
             )
         )
 
-        assertTrue(client is AutoCloseable)
+        assertIs<AutoCloseable>(client)
         client.close()
     }
 
@@ -117,11 +118,11 @@ class VolvoCarsClientTest {
             )
         )
 
-        assertTrue(client is VolvoCars)
-        assertTrue(client is ConnectedVehicle)
-        assertTrue(client is Energy)
-        assertTrue(client is Location)
-        assertTrue(client is AutoCloseable)
+        assertIs<VolvoCars>(client)
+        assertIs<ConnectedVehicle>(client)
+        assertIs<Energy>(client)
+        assertIs<Location>(client)
+        assertIs<AutoCloseable>(client)
 
         client.close()
     }

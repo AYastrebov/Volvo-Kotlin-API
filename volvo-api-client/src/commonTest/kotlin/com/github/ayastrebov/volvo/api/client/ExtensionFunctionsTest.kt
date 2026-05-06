@@ -27,13 +27,13 @@ class ExtensionFunctionsTest {
     @Test
     fun httpLoggerSimple_convertsToKtorLogger() {
         val result = HttpLogger.SIMPLE.toKtorLogger()
-        assertTrue(result is KtorLogger)
+        assertNotNull(result)
     }
 
     @Test
     fun httpLoggerNone_convertsToKtorLogger() {
         val result = HttpLogger.NONE.toKtorLogger()
-        assertTrue(result is KtorLogger)
+        assertNotNull(result)
     }
 
     @Test

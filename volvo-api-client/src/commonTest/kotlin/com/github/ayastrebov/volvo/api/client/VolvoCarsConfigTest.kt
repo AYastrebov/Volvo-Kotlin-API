@@ -7,6 +7,7 @@ import com.github.ayastrebov.volvo.api.core.RetryStrategy
 import com.github.ayastrebov.volvo.api.http.Timeout
 import com.github.ayastrebov.volvo.api.logging.LogLevel
 import kotlin.test.Test
+import kotlin.test.assertIs
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -162,9 +163,10 @@ class VolvoCarsConfigTest {
             proxy = httpProxy
         )
 
-        assertNotNull(config.proxy)
-        assertTrue(config.proxy is ProxyConfig.Http)
-        assertEquals("http://proxy.example.com:8080", (config.proxy as ProxyConfig.Http).url)
+        val proxy = config.proxy
+        assertNotNull(proxy)
+        assertIs<ProxyConfig.Http>(proxy)
+        assertEquals("http://proxy.example.com:8080", proxy.url)
     }
 
     @Test
@@ -176,10 +178,11 @@ class VolvoCarsConfigTest {
             proxy = socksProxy
         )
 
-        assertNotNull(config.proxy)
-        assertTrue(config.proxy is ProxyConfig.Socks)
-        assertEquals("socks.example.com", (config.proxy as ProxyConfig.Socks).host)
-        assertEquals(1080, (config.proxy as ProxyConfig.Socks).port)
+        val proxy = config.proxy
+        assertNotNull(proxy)
+        assertIs<ProxyConfig.Socks>(proxy)
+        assertEquals("socks.example.com", proxy.host)
+        assertEquals(1080, proxy.port)
     }
 
     // ==================== Logging Configuration ====================

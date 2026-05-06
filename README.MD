@@ -74,8 +74,8 @@ client.close()
 |----------|--------|
 | Android | `android` |
 | JVM | `jvm` |
-| iOS | `iosX64`, `iosArm64`, `iosSimulatorArm64` |
-| macOS | `macosX64`, `macosArm64` |
+| iOS | `iosArm64`, `iosSimulatorArm64` |
+| macOS | `macosArm64` |
 | Linux | `linuxX64` |
 | Windows | `mingwX64` |
 | JavaScript | `js` (Node.js) |
