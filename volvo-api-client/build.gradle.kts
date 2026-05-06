@@ -39,7 +39,7 @@ description = "Volvo API client for Kotlin"
 
 kotlin {
     explicitApi()
-    jvmToolchain(17)
+    jvmToolchain(21)
 
     androidLibrary {
         namespace = "com.github.ayastrebov.volvo.client"

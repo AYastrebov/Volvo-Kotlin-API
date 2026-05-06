@@ -36,7 +36,7 @@ description = "Volvo API core library"
 
 kotlin {
     explicitApi()
-    jvmToolchain(17)
+    jvmToolchain(21)
 
     jvm()
     wasmJs { nodejs() }
