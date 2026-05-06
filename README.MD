@@ -9,7 +9,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin 2.3"/>
+  <img src="https://img.shields.io/badge/Kotlin-2.3.21-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin 2.3.21"/>
+  <img src="https://img.shields.io/badge/JDK-21-orange" alt="JDK 21"/>
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License MIT"/>
   <img src="https://img.shields.io/badge/Platforms-Android%20%7C%20JVM%20%7C%20iOS%20%7C%20macOS%20%7C%20Linux%20%7C%20Windows%20%7C%20JS%20%7C%20Wasm-lightgrey" alt="Platforms"/>
 </p>
@@ -26,19 +27,21 @@
 
 ## Installation
 
-Add the dependency to your project:
+Add the GitHub Packages repository and dependency to your project:
 
-**Kotlin DSL**
 ```kotlin
-dependencies {
-    implementation("com.github.ayastrebov.volvo:volvo-api-client:1.0.0")
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/AYastrebov/Volvo-Kotlin-API")
+        credentials {
+            username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR")
+            password = providers.gradleProperty("gpr.token").orNull ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
-```
 
-**Groovy DSL**
-```groovy
 dependencies {
-    implementation 'com.github.ayastrebov.volvo:volvo-api-client:1.0.0'
+    implementation("com.github.ayastrebov.volvo:volvo-api-client:0.5.0")
 }
 ```
 
