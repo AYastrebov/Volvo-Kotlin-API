@@ -106,8 +106,8 @@ class EnergySerializationTest {
 
         val energyState = deserialized.getEnergyState
         assertNotNull(energyState)
-        assertTrue(energyState.isSupported == true)
-        assertTrue(energyState.batteryChargeLevel?.isSupported == true)
+        assertEquals(true, energyState.isSupported)
+        assertEquals(true, energyState.batteryChargeLevel?.isSupported)
     }
 
     @Test

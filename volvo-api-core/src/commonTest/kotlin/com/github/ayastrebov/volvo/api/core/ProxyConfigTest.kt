@@ -1,8 +1,8 @@
 package com.github.ayastrebov.volvo.api.core
 
 import kotlin.test.Test
+import kotlin.test.assertIs
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 /**
  * Tests for ProxyConfig configuration classes.
@@ -18,7 +18,7 @@ class ProxyConfigTest {
     @Test
     fun httpProxy_isProxyConfig() {
         val proxy: ProxyConfig = ProxyConfig.Http("http://proxy.example.com:8080")
-        assertTrue(proxy is ProxyConfig.Http)
+        assertIs<ProxyConfig.Http>(proxy)
     }
 
     @Test
@@ -31,7 +31,7 @@ class ProxyConfigTest {
     @Test
     fun socksProxy_isProxyConfig() {
         val proxy: ProxyConfig = ProxyConfig.Socks("socks.example.com", 1080)
-        assertTrue(proxy is ProxyConfig.Socks)
+        assertIs<ProxyConfig.Socks>(proxy)
     }
 
     @Test

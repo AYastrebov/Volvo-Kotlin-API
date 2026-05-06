@@ -5,6 +5,7 @@ import com.github.ayastrebov.volvo.api.exception.*
 import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertIs
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
@@ -294,7 +295,7 @@ class ExceptionHandlingTest {
             client.getVehicleList()
         }
 
-        assertTrue(exception is AuthenticationException)
+        assertIs<AuthenticationException>(exception)
     }
 
     @Test
@@ -308,7 +309,7 @@ class ExceptionHandlingTest {
             client.getVehicleList()
         }
 
-        assertTrue(exception is RateLimitException)
+        assertIs<RateLimitException>(exception)
     }
 
     @Test
@@ -322,7 +323,7 @@ class ExceptionHandlingTest {
             client.getVehicleList()
         }
 
-        assertTrue(exception is InvalidRequestException)
+        assertIs<InvalidRequestException>(exception)
     }
 
     @Test
@@ -336,7 +337,7 @@ class ExceptionHandlingTest {
             client.getVehicleList()
         }
 
-        assertTrue(exception is PermissionException)
+        assertIs<PermissionException>(exception)
     }
 
     @Test
@@ -350,6 +351,6 @@ class ExceptionHandlingTest {
             client.getVehicleList()
         }
 
-        assertTrue(exception is VolvoAPIException)
+        assertIs<VolvoAPIException>(exception)
     }
 }

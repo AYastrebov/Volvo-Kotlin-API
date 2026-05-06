@@ -235,7 +235,7 @@ class VolvoCarsConfigTest {
         assertEquals(45.seconds, config.timeout.socket)
         assertEquals(15.seconds, config.timeout.connect)
         assertEquals("value", config.headers["X-Test"])
-        assertTrue(config.proxy is ProxyConfig.Http)
+        assertIs<ProxyConfig.Http>(config.proxy)
         assertEquals(5, config.retry.maxRetries)
         assertEquals(2.5, config.retry.base)
         assertEquals(90.seconds, config.retry.maxDelay)

@@ -3,7 +3,6 @@ package com.github.ayastrebov.volvo.api.exception
 import kotlin.test.Test
 import kotlin.test.assertIs
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**

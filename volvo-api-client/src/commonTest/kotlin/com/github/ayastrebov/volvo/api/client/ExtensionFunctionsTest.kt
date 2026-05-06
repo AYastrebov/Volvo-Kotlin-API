@@ -10,6 +10,7 @@ import com.github.ayastrebov.volvo.api.logging.HttpLogger
 import com.github.ayastrebov.volvo.api.logging.LogLevel
 import io.ktor.client.request.*
 import kotlin.test.Test
+import kotlin.test.assertIs
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -27,13 +28,13 @@ class ExtensionFunctionsTest {
     @Test
     fun httpLoggerSimple_convertsToKtorLogger() {
         val result = HttpLogger.SIMPLE.toKtorLogger()
-        assertNotNull(result)
+        assertIs<KtorLogger>(result)
     }
 
     @Test
     fun httpLoggerNone_convertsToKtorLogger() {
         val result = HttpLogger.NONE.toKtorLogger()
-        assertNotNull(result)
+        assertIs<KtorLogger>(result)
     }
 
     @Test
