@@ -58,6 +58,7 @@ jobs:
 
   docs:
     needs: test
+    if: vars.ENABLE_PAGES == 'true'
     runs-on: ubuntu-latest
 
     permissions:
