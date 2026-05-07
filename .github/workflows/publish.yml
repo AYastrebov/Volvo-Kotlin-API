@@ -48,7 +48,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Publish to GitHub Packages
-        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
+        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository -PVolvoApiClientDeployVersion=${GITHUB_REF_NAME}
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -83,7 +83,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Generate documentation
-        run: ./gradlew dokkaGenerate
+        run: ./gradlew dokkaGenerate -PVolvoApiClientDeployVersion=${GITHUB_REF_NAME}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
