@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.kotlinx.binary.validator)
 }
 
 // Dokka configuration

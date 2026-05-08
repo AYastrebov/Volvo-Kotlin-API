@@ -82,9 +82,12 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
 
         install(HttpRequestRetry) {
             maxRetries = config.retry.maxRetries
-            // Retry on configured status codes (default: rate limit and transient server errors)
             retryIf { _, response -> response.status.value in config.retry.retryOnStatusCodes }
-            exponentialDelay(config.retry.base, config.retry.maxDelay.inWholeMilliseconds)
+            exponentialDelay(
+                base = config.retry.base,
+                maxDelayMs = config.retry.maxDelay.inWholeMilliseconds,
+                randomizationMs = (config.retry.maxDelay.inWholeMilliseconds * 0.25).toLong(),
+            )
         }
 
         install(SSE)

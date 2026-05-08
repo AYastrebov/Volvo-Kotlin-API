@@ -19,12 +19,17 @@ internal suspend inline fun <reified T> FlowCollector<T>.streamEventsFrom(respon
     try {
         while (currentCoroutineContext().isActive && !channel.isClosedForRead) {
             val line = channel.readLine() ?: continue
-            val value: T = when {
+            when {
                 line.startsWith(STREAM_END_TOKEN) -> break
-                line.startsWith(STREAM_PREFIX) -> JsonLenient.decodeFromString(line.removePrefix(STREAM_PREFIX))
-                else -> continue
+                line.startsWith(STREAM_PREFIX) -> {
+                    val value: T? = try {
+                        JsonLenient.decodeFromString(line.removePrefix(STREAM_PREFIX))
+                    } catch (_: Exception) {
+                        null
+                    }
+                    if (value != null) emit(value)
+                }
             }
-            emit(value)
         }
     } finally {
         channel.cancel()

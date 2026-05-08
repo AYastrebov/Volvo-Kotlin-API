@@ -42,8 +42,15 @@ repositories {
 
 dependencies {
     implementation("com.github.ayastrebov.volvo:volvo-api-client:0.5.4")
+
+    // Add a Ktor HTTP engine for your platform:
+    implementation("io.ktor:ktor-client-okhttp:3.4.3")    // JVM / Android
+    // implementation("io.ktor:ktor-client-darwin:3.4.3")  // iOS / macOS
+    // implementation("io.ktor:ktor-client-js:3.4.3")      // JS (Node.js)
 }
 ```
+
+> **Note:** A Ktor HTTP engine is required at runtime. Choose the engine matching your target platform. See [Ktor engines](https://ktor.io/docs/client-engines.html) for all options.
 
 ## Quick Start
 
@@ -186,6 +193,34 @@ gpr.token=your-github-token
 ```
 
 </details>
+
+## Advanced Configuration
+
+### Authentication
+
+The client uses a **static** OAuth2 Bearer token. If the token expires during a long-running session, create a new client with a fresh token:
+
+```kotlin
+val client = VolvoCars(apiKey = "your-key", token = freshToken)
+```
+
+Automatic token refresh is not supported. Handle token renewal externally (e.g., via your OAuth2 library).
+
+### Custom HTTP Configuration
+
+Use `httpClientConfig` to add Ktor plugins for metrics, custom headers, or other advanced scenarios:
+
+```kotlin
+val client = VolvoCars(
+    apiKey = "your-key",
+    token = "your-token",
+    httpClientConfig = {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 60_000
+        }
+    }
+)
+```
 
 ## Artifact Verification
 

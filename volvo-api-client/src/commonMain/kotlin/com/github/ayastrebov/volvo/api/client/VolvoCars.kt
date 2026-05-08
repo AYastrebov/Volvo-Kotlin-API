@@ -13,7 +13,34 @@ import com.github.ayastrebov.volvo.api.http.Timeout
 import io.ktor.client.*
 import kotlin.time.Duration.Companion.seconds
 
-public interface VolvoCars: ConnectedVehicle, Location, Energy, AutoCloseable
+/**
+ * Main entry point for Volvo Vehicle API operations.
+ *
+ * Combines [ConnectedVehicle], [Energy], and [Location] APIs into a single client.
+ *
+ * **Thread Safety:** This client is safe for concurrent coroutine execution.
+ * A single instance can handle multiple simultaneous requests.
+ *
+ * **Resource Management:** Create one client and reuse it across your application.
+ * Call [close] when done to release underlying HTTP resources.
+ * Calling [close] multiple times is safe.
+ *
+ * **Authentication:** The client uses a static OAuth2 Bearer token. If the token
+ * expires, create a new client instance with a fresh token. Automatic token
+ * refresh is not supported.
+ *
+ * ```kotlin
+ * val client = VolvoCars(apiKey = "your-key", token = "your-token")
+ * try {
+ *     val vehicles = client.getVehicleList()
+ * } finally {
+ *     client.close()
+ * }
+ * ```
+ *
+ * @see VolvoCarsConfig for detailed configuration options
+ */
+public interface VolvoCars : ConnectedVehicle, Location, Energy, AutoCloseable
 
 /**
  * Creates an instance of [VolvoCars] with individual configuration parameters.
