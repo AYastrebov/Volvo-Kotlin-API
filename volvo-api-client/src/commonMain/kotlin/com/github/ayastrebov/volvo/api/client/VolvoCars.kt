@@ -6,12 +6,7 @@ import com.github.ayastrebov.volvo.api.api.Location
 import com.github.ayastrebov.volvo.api.client.internal.VolvoCarsApi
 import com.github.ayastrebov.volvo.api.client.internal.createHttpClient
 import com.github.ayastrebov.volvo.api.client.internal.http.HttpTransport
-import com.github.ayastrebov.volvo.api.core.LoggingConfig
-import com.github.ayastrebov.volvo.api.core.ProxyConfig
-import com.github.ayastrebov.volvo.api.core.RetryStrategy
-import com.github.ayastrebov.volvo.api.http.Timeout
-import io.ktor.client.*
-import kotlin.time.Duration.Companion.seconds
+import com.github.ayastrebov.volvo.api.core.OAuthConfig
 
 /**
  * Main entry point for Volvo Vehicle API operations.
@@ -25,69 +20,62 @@ import kotlin.time.Duration.Companion.seconds
  * Call [close] when done to release underlying HTTP resources.
  * Calling [close] multiple times is safe.
  *
- * **Authentication:** By default, the client uses a static OAuth2 Bearer token.
- * For automatic token refresh, provide [OAuthConfig][com.github.ayastrebov.volvo.api.core.OAuthConfig]
- * with your OAuth2 client credentials. The client will automatically refresh
- * expired tokens using the Volvo ID token endpoint.
+ * **Authentication:** Supports two modes:
+ * - **OAuth2 with automatic refresh** (recommended): Provide [OAuthConfig] with client
+ *   credentials. The client automatically refreshes expired tokens via the Volvo ID
+ *   token endpoint. Use [OAuthConfig.onTokensRefreshed] to persist rotated tokens.
+ * - **Static token**: Provide a Bearer token directly. When it expires, create a
+ *   new client with a fresh token.
  *
  * ```kotlin
+ * // OAuth2 with automatic refresh (recommended)
+ * val client = VolvoCars(
+ *     VolvoCarsConfig(
+ *         apiKey = "your-vcc-api-key",
+ *         oauth = OAuthConfig(
+ *             accessToken = storedAccessToken,
+ *             refreshToken = storedRefreshToken,
+ *             clientId = "your-client-id",
+ *             clientSecret = "your-client-secret",
+ *             onTokensRefreshed = { access, refresh -> save(access, refresh) }
+ *         )
+ *     )
+ * )
+ *
+ * // Static token (testing / short-lived scripts)
  * val client = VolvoCars(apiKey = "your-key", token = "your-token")
- * try {
- *     val vehicles = client.getVehicleList()
- * } finally {
- *     client.close()
- * }
  * ```
  *
  * @see VolvoCarsConfig for detailed configuration options
+ * @see OAuthConfig for OAuth2 token refresh configuration
  */
 public interface VolvoCars : ConnectedVehicle, Location, Energy, AutoCloseable
 
 /**
- * Creates an instance of [VolvoCars] with individual configuration parameters.
+ * Creates a [VolvoCars] client with a static Bearer token.
  *
- * This factory function provides a convenient way to create a Volvo API client
- * without manually constructing a [VolvoCarsConfig] object.
+ * This is a convenience factory for testing and short-lived scripts.
+ * For production apps, use [VolvoCarsConfig] with [OAuthConfig] for automatic token refresh.
  *
- * @param apiKey The VCC API key obtained from the Volvo developer portal
- * @param token The OAuth2 access token for authenticating API requests
- * @param logging Configuration for HTTP request/response logging (default: no logging)
- * @param timeout Timeout configuration for HTTP requests (default: 30 seconds socket timeout)
- * @param headers Additional HTTP headers to include in all requests
- * @param proxy Optional proxy configuration for HTTP requests
- * @param retry Retry strategy configuration for failed requests (default: no retries)
- * @param httpClientConfig Additional Ktor HttpClient configuration block
- * @return A configured [VolvoCars] instance ready for API calls
- *
- * @see VolvoCars Overload accepting [VolvoCarsConfig] for more complex configurations
- * @see VolvoCarsConfig For detailed configuration options
+ * @param apiKey The VCC API key from the Volvo Developer Portal
+ * @param token The OAuth2 access token (will not be refreshed automatically)
+ * @return A configured [VolvoCars] instance
  */
 public fun VolvoCars(
     apiKey: String,
     token: String,
-    logging: LoggingConfig = LoggingConfig(),
-    timeout: Timeout = Timeout(socket = 30.seconds),
-    headers: Map<String, String> = emptyMap(),
-    proxy: ProxyConfig? = null,
-    retry: RetryStrategy = RetryStrategy(),
-    httpClientConfig: HttpClientConfig<*>.() -> Unit = {}
 ): VolvoCars = VolvoCars(
     config = VolvoCarsConfig(
         apiKey = apiKey,
         token = token,
-        logging = logging,
-        timeout = timeout,
-        headers = headers,
-        proxy = proxy,
-        retry = retry,
-        httpClientConfig = httpClientConfig,
     )
 )
 
 /**
- * Creates an instance of [VolvoCarsApi].
+ * Creates a [VolvoCars] client with full configuration.
  *
- * @param config client config
+ * @param config Client configuration including authentication, timeouts, retry, and logging
+ * @return A configured [VolvoCars] instance
  */
 public fun VolvoCars(config: VolvoCarsConfig): VolvoCars {
     val httpClient = createHttpClient(config)

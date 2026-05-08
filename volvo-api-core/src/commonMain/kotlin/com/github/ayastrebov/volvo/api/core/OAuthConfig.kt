@@ -1,35 +1,50 @@
 package com.github.ayastrebov.volvo.api.core
 
 /**
- * OAuth2 configuration for automatic token refresh.
+ * OAuth2 authentication configuration for the Volvo ID identity system.
  *
- * When provided, the client will automatically refresh the access token using
- * the Volvo ID token endpoint when a 401 response is received.
+ * Handles the complete OAuth2 Bearer token lifecycle including automatic refresh.
+ * When the access token expires (401 response), the client automatically requests
+ * a new one from the Volvo ID token endpoint using the refresh token.
  *
- * Volvo ID uses refresh token rotation — each refresh returns a new refresh token
- * and invalidates the previous one. The [onTokenRefreshed] callback allows you to
- * persist the new tokens.
+ * **Refresh token rotation:** Volvo ID returns a new refresh token with each refresh.
+ * The old refresh token is immediately invalidated. Use [onTokensRefreshed] to persist
+ * the new tokens so they survive app restarts.
  *
- * Token lifecycle:
- * - Access tokens are short-lived (check `expires_in` from the token response)
- * - Refresh tokens must be used within **7 days** or they expire
+ * **Token lifecycle:**
+ * - Access tokens are short-lived (typically minutes)
+ * - Refresh tokens expire after **7 days** of inactivity
  * - Maximum grant lifetime is **6 months** with continuous refreshing
+ * - After 6 months the user must re-authenticate
  *
- * @property tokenUrl The Volvo ID token endpoint URL
- * @property clientId OAuth2 client ID from the Volvo Developer Portal
+ * ```kotlin
+ * val auth = OAuthConfig(
+ *     accessToken = storedAccessToken,
+ *     refreshToken = storedRefreshToken,
+ *     clientId = "your-client-id",
+ *     clientSecret = "your-client-secret",
+ *     onTokensRefreshed = { newAccess, newRefresh ->
+ *         storage.save(newAccess, newRefresh)
+ *     }
+ * )
+ * ```
+ *
+ * @property accessToken The current OAuth2 access token (Bearer token for API calls)
+ * @property refreshToken The current refresh token for obtaining new access tokens
+ * @property clientId OAuth2 client ID from the [Volvo Developer Portal](https://developer.volvocars.com/)
  * @property clientSecret OAuth2 client secret from the Volvo Developer Portal
- * @property refreshToken The current refresh token obtained during authorization
- * @property onTokenRefreshed Callback invoked when tokens are refreshed, providing
- *   the new access token and refresh token for persistence
- *
- * @see [Volvo Authorization Docs](https://developer.volvocars.com/apis/docs/authorisation/)
+ * @property tokenUrl The Volvo ID token endpoint URL (override for testing)
+ * @property onTokensRefreshed Callback invoked after a successful token refresh with the
+ *   new access token and new refresh token. **Must persist both tokens** — the old
+ *   refresh token is invalidated immediately.
  */
 public data class OAuthConfig(
-    public val tokenUrl: String = TOKEN_URL,
+    public val accessToken: String,
+    public val refreshToken: String,
     public val clientId: String,
     public val clientSecret: String,
-    public val refreshToken: String,
-    public val onTokenRefreshed: ((accessToken: String, refreshToken: String) -> Unit)? = null,
+    public val tokenUrl: String = TOKEN_URL,
+    public val onTokensRefreshed: ((accessToken: String, refreshToken: String) -> Unit)? = null,
 ) {
     public companion object {
         /** Default Volvo ID token endpoint. */

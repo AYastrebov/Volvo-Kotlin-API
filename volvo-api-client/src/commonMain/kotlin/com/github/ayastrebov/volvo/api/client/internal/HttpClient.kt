@@ -70,14 +70,14 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
             bearer {
                 loadTokens {
                     BearerTokens(
-                        accessToken = config.token,
+                        accessToken = config.accessToken,
                         refreshToken = config.oauth?.refreshToken ?: ""
                     )
                 }
                 config.oauth?.let { oauth ->
                     refreshTokens {
                         val response = refreshTokenRequest(oauth)
-                        oauth.onTokenRefreshed?.invoke(response.accessToken, response.refreshToken)
+                        oauth.onTokensRefreshed?.invoke(response.accessToken, response.refreshToken)
                         BearerTokens(
                             accessToken = response.accessToken,
                             refreshToken = response.refreshToken

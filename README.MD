@@ -55,25 +55,29 @@ dependencies {
 ## Quick Start
 
 ```kotlin
+// OAuth2 with automatic token refresh (recommended)
 val client = VolvoCars(
-    apiKey = "your-vcc-api-key",
-    token = "your-access-token"
+    VolvoCarsConfig(
+        apiKey = "your-vcc-api-key",
+        oauth = OAuthConfig(
+            accessToken = storedAccessToken,
+            refreshToken = storedRefreshToken,
+            clientId = "your-client-id",
+            clientSecret = "your-client-secret",
+            onTokensRefreshed = { accessToken, refreshToken ->
+                // Persist tokens — Volvo ID rotates refresh tokens on each use
+                tokenStorage.save(accessToken, refreshToken)
+            }
+        )
+    )
 )
 
-// Get list of vehicles
+// Or with a static token (for testing)
+// val client = VolvoCars(apiKey = "your-key", token = "your-test-token")
+
 val vehicles = client.getVehicleList()
-
-// Get vehicle details
-val details = client.getVehicleDetails("YV1XZ...")
-
-// Lock vehicle
-val lockResponse = client.invokeLock("YV1XZ...")
-
-// Get energy state (electric/hybrid vehicles)
-val energyState = client.getEnergyState("YV1XZ...")
-
-// Get vehicle location
 val location = client.getVehicleLocation("YV1XZ...")
+val lockResponse = client.invokeLock("YV1XZ...")
 
 client.close()
 ```
@@ -198,27 +202,11 @@ gpr.token=your-github-token
 
 ### Authentication
 
-By default the client uses a static Bearer token. For long-running sessions, enable **automatic token refresh** by providing OAuth2 credentials:
+The client supports two authentication modes:
 
-```kotlin
-val client = VolvoCars(
-    VolvoCarsConfig(
-        apiKey = "your-vcc-api-key",
-        token = "your-access-token",
-        oauth = OAuthConfig(
-            clientId = "your-client-id",
-            clientSecret = "your-client-secret",
-            refreshToken = "your-refresh-token",
-            onTokenRefreshed = { accessToken, refreshToken ->
-                // Persist new tokens — Volvo ID uses refresh token rotation
-                saveTokens(accessToken, refreshToken)
-            }
-        )
-    )
-)
-```
+**OAuth2 with automatic refresh (recommended):** Provide `OAuthConfig` with your client credentials. The client automatically refreshes expired tokens via the [Volvo ID token endpoint](https://developer.volvocars.com/apis/docs/authorisation/). Volvo ID uses **refresh token rotation** — each refresh returns a new refresh token and invalidates the old one. Use `onTokensRefreshed` to persist the new tokens.
 
-When `oauth` is configured, the client automatically refreshes the access token on 401 responses using the [Volvo ID token endpoint](https://developer.volvocars.com/apis/docs/authorisation/). Without `oauth`, you must create a new client instance when the token expires.
+**Static token:** Use `VolvoCars(apiKey, token)` for testing with [test access tokens](https://developer.volvocars.com/apis/docs/test-access-tokens/). The token will not be refreshed automatically.
 
 ### Custom HTTP Configuration
 

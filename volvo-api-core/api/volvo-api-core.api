@@ -120,19 +120,21 @@ public final class com/github/ayastrebov/volvo/api/core/LoggingConfig {
 public final class com/github/ayastrebov/volvo/api/core/OAuthConfig {
 	public static final field Companion Lcom/github/ayastrebov/volvo/api/core/OAuthConfig$Companion;
 	public static final field TOKEN_URL Ljava/lang/String;
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function2;)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function2;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function2;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function2;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Ljava/lang/String;
 	public final fun component4 ()Ljava/lang/String;
-	public final fun component5 ()Lkotlin/jvm/functions/Function2;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function2;)Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;
-	public static synthetic fun copy$default (Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Lkotlin/jvm/functions/Function2;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function2;)Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;
+	public static synthetic fun copy$default (Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAccessToken ()Ljava/lang/String;
 	public final fun getClientId ()Ljava/lang/String;
 	public final fun getClientSecret ()Ljava/lang/String;
-	public final fun getOnTokenRefreshed ()Lkotlin/jvm/functions/Function2;
+	public final fun getOnTokensRefreshed ()Lkotlin/jvm/functions/Function2;
 	public final fun getRefreshToken ()Ljava/lang/String;
 	public final fun getTokenUrl ()Ljava/lang/String;
 	public fun hashCode ()I
