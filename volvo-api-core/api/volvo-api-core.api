@@ -100,6 +100,27 @@ public final class com/github/ayastrebov/volvo/api/api/Location$DefaultImpls {
 	public static synthetic fun getVehicleLocation$default (Lcom/github/ayastrebov/volvo/api/api/Location;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/RequestOptions;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class com/github/ayastrebov/volvo/api/core/CircuitBreaker {
+	public fun <init> (Lcom/github/ayastrebov/volvo/api/core/CircuitBreakerConfig;)V
+	public final fun allowRequest ()Z
+	public final fun recordFailure ()V
+	public final fun recordSuccess ()V
+}
+
+public final class com/github/ayastrebov/volvo/api/core/CircuitBreakerConfig {
+	public synthetic fun <init> (IJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (IJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun component2-UwyO8pc ()J
+	public final fun copy-HG0u8IE (IJ)Lcom/github/ayastrebov/volvo/api/core/CircuitBreakerConfig;
+	public static synthetic fun copy-HG0u8IE$default (Lcom/github/ayastrebov/volvo/api/core/CircuitBreakerConfig;IJILjava/lang/Object;)Lcom/github/ayastrebov/volvo/api/core/CircuitBreakerConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFailureThreshold ()I
+	public final fun getResetTimeout-UwyO8pc ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class com/github/ayastrebov/volvo/api/core/LoggingConfig {
 	public fun <init> ()V
 	public fun <init> (Lcom/github/ayastrebov/volvo/api/logging/LogLevel;Lcom/github/ayastrebov/volvo/api/logging/HttpLogger;Z)V
@@ -142,6 +163,18 @@ public final class com/github/ayastrebov/volvo/api/core/OAuthConfig {
 }
 
 public final class com/github/ayastrebov/volvo/api/core/OAuthConfig$Companion {
+}
+
+public final class com/github/ayastrebov/volvo/api/core/Pkce {
+	public static final field Companion Lcom/github/ayastrebov/volvo/api/core/Pkce$Companion;
+	public final fun getCodeChallenge ()Ljava/lang/String;
+	public final fun getCodeChallengeMethod ()Ljava/lang/String;
+	public final fun getCodeVerifier ()Ljava/lang/String;
+}
+
+public final class com/github/ayastrebov/volvo/api/core/Pkce$Companion {
+	public final fun generate (Lkotlin/random/Random;)Lcom/github/ayastrebov/volvo/api/core/Pkce;
+	public static synthetic fun generate$default (Lcom/github/ayastrebov/volvo/api/core/Pkce$Companion;Lkotlin/random/Random;ILjava/lang/Object;)Lcom/github/ayastrebov/volvo/api/core/Pkce;
 }
 
 public abstract interface class com/github/ayastrebov/volvo/api/core/ProxyConfig {
@@ -191,6 +224,20 @@ public final class com/github/ayastrebov/volvo/api/core/RetryStrategy {
 	public final fun getRetryOnStatusCodes ()Ljava/util/Set;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/github/ayastrebov/volvo/api/core/Traceparent {
+	public static final field Companion Lcom/github/ayastrebov/volvo/api/core/Traceparent$Companion;
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getParentId ()Ljava/lang/String;
+	public final fun getTraceId ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/github/ayastrebov/volvo/api/core/Traceparent$Companion {
+	public final fun generate (Lkotlin/random/Random;)Lcom/github/ayastrebov/volvo/api/core/Traceparent;
+	public static synthetic fun generate$default (Lcom/github/ayastrebov/volvo/api/core/Traceparent$Companion;Lkotlin/random/Random;ILjava/lang/Object;)Lcom/github/ayastrebov/volvo/api/core/Traceparent;
 }
 
 public final class com/github/ayastrebov/volvo/api/exception/AuthenticationException : com/github/ayastrebov/volvo/api/exception/VolvoAPIException {

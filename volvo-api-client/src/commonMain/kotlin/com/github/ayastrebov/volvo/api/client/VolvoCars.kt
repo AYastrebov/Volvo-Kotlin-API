@@ -6,6 +6,7 @@ import com.github.ayastrebov.volvo.api.api.Location
 import com.github.ayastrebov.volvo.api.client.internal.VolvoCarsApi
 import com.github.ayastrebov.volvo.api.client.internal.createHttpClient
 import com.github.ayastrebov.volvo.api.client.internal.http.HttpTransport
+import com.github.ayastrebov.volvo.api.core.CircuitBreaker
 import com.github.ayastrebov.volvo.api.core.OAuthConfig
 
 /**
@@ -79,6 +80,7 @@ public fun VolvoCars(
  */
 public fun VolvoCars(config: VolvoCarsConfig): VolvoCars {
     val httpClient = createHttpClient(config)
-    val transport = HttpTransport(httpClient)
+    val circuitBreaker = config.circuitBreaker?.let { CircuitBreaker(it) }
+    val transport = HttpTransport(httpClient, circuitBreaker)
     return VolvoCarsApi(transport)
 }

@@ -1,5 +1,6 @@
 package com.github.ayastrebov.volvo.api.client
 
+import com.github.ayastrebov.volvo.api.core.CircuitBreakerConfig
 import com.github.ayastrebov.volvo.api.core.LoggingConfig
 import com.github.ayastrebov.volvo.api.core.OAuthConfig
 import com.github.ayastrebov.volvo.api.core.ProxyConfig
@@ -43,7 +44,10 @@ import kotlin.time.Duration.Companion.seconds
  * @property timeout HTTP timeout configuration for request, connect, and socket timeouts
  * @property headers Additional HTTP headers to include in every request
  * @property proxy Proxy configuration ([ProxyConfig.Http] or [ProxyConfig.Socks])
- * @property retry Retry strategy with exponential backoff for transient errors (429, 5xx)
+ * @property retry Retry strategy with exponential backoff for transient errors (429, 5xx).
+ *   Honors `Retry-After` headers from 429 responses when present.
+ * @property circuitBreaker Optional circuit breaker to stop retries after sustained failures.
+ *   When open, requests fail immediately without hitting the server. See [CircuitBreakerConfig].
  * @property engine Explicit Ktor [HttpClientEngine] (useful for testing with mock engines)
  * @property httpClientConfig Additional Ktor HttpClient configuration block for advanced customization
  * @throws IllegalArgumentException if neither [oauth] nor [token] is provided, or if both are provided
@@ -57,6 +61,7 @@ public data class VolvoCarsConfig(
     public val headers: Map<String, String> = emptyMap(),
     public val proxy: ProxyConfig? = null,
     public val retry: RetryStrategy = RetryStrategy(),
+    public val circuitBreaker: CircuitBreakerConfig? = null,
     public val engine: HttpClientEngine? = null,
     public val httpClientConfig: HttpClientConfig<*>.() -> Unit = {}
 ) {

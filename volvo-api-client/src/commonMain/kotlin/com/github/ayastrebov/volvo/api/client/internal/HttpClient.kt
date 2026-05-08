@@ -22,6 +22,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.math.pow
 import kotlin.time.DurationUnit
 
 /**
@@ -100,13 +101,27 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
         }
 
         install(HttpRequestRetry) {
+            var retryAfterMs = 0L
             maxRetries = config.retry.maxRetries
-            retryIf { _, response -> response.status.value in config.retry.retryOnStatusCodes }
-            exponentialDelay(
-                base = config.retry.base,
-                maxDelayMs = config.retry.maxDelay.inWholeMilliseconds,
-                randomizationMs = (config.retry.maxDelay.inWholeMilliseconds * 0.25).toLong(),
-            )
+            retryIf { _, response ->
+                val shouldRetry = response.status.value in config.retry.retryOnStatusCodes
+                if (shouldRetry) {
+                    retryAfterMs = (response.headers[HttpHeaders.RetryAfter]?.toLongOrNull() ?: 0) * 1000
+                }
+                shouldRetry
+            }
+            delayMillis { retry ->
+                val serverDelay = retryAfterMs.also { retryAfterMs = 0 }
+                if (serverDelay > 0) {
+                    serverDelay.coerceAtMost(config.retry.maxDelay.inWholeMilliseconds)
+                } else {
+                    val exponentialMs = (config.retry.base.pow(retry) * 1000)
+                        .toLong()
+                        .coerceAtMost(config.retry.maxDelay.inWholeMilliseconds)
+                    val jitterMs = (exponentialMs * 0.25 * kotlin.random.Random.nextDouble()).toLong()
+                    exponentialMs + jitterMs
+                }
+            }
         }
 
         install(SSE)

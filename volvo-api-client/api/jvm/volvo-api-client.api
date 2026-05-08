@@ -2,10 +2,11 @@ public abstract interface class com/github/ayastrebov/volvo/api/client/VolvoCars
 }
 
 public final class com/github/ayastrebov/volvo/api/client/VolvoCarsConfig {
-	public fun <init> (Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/LoggingConfig;Lcom/github/ayastrebov/volvo/api/http/Timeout;Ljava/util/Map;Lcom/github/ayastrebov/volvo/api/core/ProxyConfig;Lcom/github/ayastrebov/volvo/api/core/RetryStrategy;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;)V
-	public synthetic fun <init> (Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/LoggingConfig;Lcom/github/ayastrebov/volvo/api/http/Timeout;Ljava/util/Map;Lcom/github/ayastrebov/volvo/api/core/ProxyConfig;Lcom/github/ayastrebov/volvo/api/core/RetryStrategy;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/LoggingConfig;Lcom/github/ayastrebov/volvo/api/http/Timeout;Ljava/util/Map;Lcom/github/ayastrebov/volvo/api/core/ProxyConfig;Lcom/github/ayastrebov/volvo/api/core/RetryStrategy;Lcom/github/ayastrebov/volvo/api/core/CircuitBreakerConfig;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/LoggingConfig;Lcom/github/ayastrebov/volvo/api/http/Timeout;Ljava/util/Map;Lcom/github/ayastrebov/volvo/api/core/ProxyConfig;Lcom/github/ayastrebov/volvo/api/core/RetryStrategy;Lcom/github/ayastrebov/volvo/api/core/CircuitBreakerConfig;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
-	public final fun component10 ()Lkotlin/jvm/functions/Function1;
+	public final fun component10 ()Lio/ktor/client/engine/HttpClientEngine;
+	public final fun component11 ()Lkotlin/jvm/functions/Function1;
 	public final fun component2 ()Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;
 	public final fun component3 ()Ljava/lang/String;
 	public final fun component4 ()Lcom/github/ayastrebov/volvo/api/core/LoggingConfig;
@@ -13,11 +14,12 @@ public final class com/github/ayastrebov/volvo/api/client/VolvoCarsConfig {
 	public final fun component6 ()Ljava/util/Map;
 	public final fun component7 ()Lcom/github/ayastrebov/volvo/api/core/ProxyConfig;
 	public final fun component8 ()Lcom/github/ayastrebov/volvo/api/core/RetryStrategy;
-	public final fun component9 ()Lio/ktor/client/engine/HttpClientEngine;
-	public final fun copy (Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/LoggingConfig;Lcom/github/ayastrebov/volvo/api/http/Timeout;Ljava/util/Map;Lcom/github/ayastrebov/volvo/api/core/ProxyConfig;Lcom/github/ayastrebov/volvo/api/core/RetryStrategy;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;)Lcom/github/ayastrebov/volvo/api/client/VolvoCarsConfig;
-	public static synthetic fun copy$default (Lcom/github/ayastrebov/volvo/api/client/VolvoCarsConfig;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/LoggingConfig;Lcom/github/ayastrebov/volvo/api/http/Timeout;Ljava/util/Map;Lcom/github/ayastrebov/volvo/api/core/ProxyConfig;Lcom/github/ayastrebov/volvo/api/core/RetryStrategy;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/github/ayastrebov/volvo/api/client/VolvoCarsConfig;
+	public final fun component9 ()Lcom/github/ayastrebov/volvo/api/core/CircuitBreakerConfig;
+	public final fun copy (Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/LoggingConfig;Lcom/github/ayastrebov/volvo/api/http/Timeout;Ljava/util/Map;Lcom/github/ayastrebov/volvo/api/core/ProxyConfig;Lcom/github/ayastrebov/volvo/api/core/RetryStrategy;Lcom/github/ayastrebov/volvo/api/core/CircuitBreakerConfig;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;)Lcom/github/ayastrebov/volvo/api/client/VolvoCarsConfig;
+	public static synthetic fun copy$default (Lcom/github/ayastrebov/volvo/api/client/VolvoCarsConfig;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/OAuthConfig;Ljava/lang/String;Lcom/github/ayastrebov/volvo/api/core/LoggingConfig;Lcom/github/ayastrebov/volvo/api/http/Timeout;Ljava/util/Map;Lcom/github/ayastrebov/volvo/api/core/ProxyConfig;Lcom/github/ayastrebov/volvo/api/core/RetryStrategy;Lcom/github/ayastrebov/volvo/api/core/CircuitBreakerConfig;Lio/ktor/client/engine/HttpClientEngine;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/github/ayastrebov/volvo/api/client/VolvoCarsConfig;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getApiKey ()Ljava/lang/String;
+	public final fun getCircuitBreaker ()Lcom/github/ayastrebov/volvo/api/core/CircuitBreakerConfig;
 	public final fun getEngine ()Lio/ktor/client/engine/HttpClientEngine;
 	public final fun getHeaders ()Ljava/util/Map;
 	public final fun getHttpClientConfig ()Lkotlin/jvm/functions/Function1;

@@ -1,5 +1,6 @@
 package com.github.ayastrebov.volvo.api.client.internal.http
 
+import com.github.ayastrebov.volvo.api.core.CircuitBreaker
 import com.github.ayastrebov.volvo.api.exception.*
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -11,16 +12,23 @@ import io.ktor.util.reflect.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.io.IOException
 
-/** HTTP transport layer */
-internal class HttpTransport(private val httpClient: HttpClient) : HttpRequester {
+/** HTTP transport layer with optional circuit breaker. */
+internal class HttpTransport(
+    private val httpClient: HttpClient,
+    private val circuitBreaker: CircuitBreaker? = null,
+) : HttpRequester {
 
     /** Perform an HTTP request and get a result */
     override suspend fun <T : Any> perform(info: TypeInfo, block: suspend (HttpClient) -> HttpResponse): T {
+        checkCircuitBreaker()
         try {
             val response = block(httpClient)
+            circuitBreaker?.recordSuccess()
             return response.body(info)
         } catch (e: Exception) {
-            throw handleException(e)
+            val mapped = handleException(e)
+            circuitBreaker?.recordFailure()
+            throw mapped
         }
     }
 
@@ -28,15 +36,33 @@ internal class HttpTransport(private val httpClient: HttpClient) : HttpRequester
         builder: HttpRequestBuilder,
         block: suspend (response: HttpResponse) -> T
     ) {
+        checkCircuitBreaker()
         try {
             HttpStatement(builder = builder, client = httpClient).execute(block)
+            circuitBreaker?.recordSuccess()
         } catch (e: Exception) {
-            throw handleException(e)
+            val mapped = handleException(e)
+            circuitBreaker?.recordFailure()
+            throw mapped
         }
     }
 
     override fun close() {
         httpClient.close()
+    }
+
+    private fun checkCircuitBreaker() {
+        if (circuitBreaker != null && !circuitBreaker.allowRequest()) {
+            throw RateLimitException(
+                statusCode = 429,
+                error = VolvoApiError(
+                    detail = VolvoErrorDetails(
+                        message = "Circuit breaker is open — too many consecutive failures. " +
+                                "Requests will resume after the reset timeout."
+                    )
+                )
+            )
+        }
     }
 
     /**
