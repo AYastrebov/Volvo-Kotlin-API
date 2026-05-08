@@ -137,9 +137,22 @@ volvo-api-client/src/
 │   ├── LocationApiTest.kt          # Location API tests (6 tests)
 │   ├── RetryBehaviorTest.kt        # Retry logic tests (12 tests)
 │   ├── TimeoutBehaviorTest.kt      # Timeout handling tests (13 tests)
-│   └── VolvoCarsConfigTest.kt      # Configuration tests (12 tests)
+│   └── VolvoCarsConfigTest.kt      # Configuration tests (18 tests)
 └── jvmTest/kotlin/com/github/ayastrebov/volvo/api/client/
     └── VolvoCarsClientTest.kt      # JVM client lifecycle tests (5 tests)
+
+volvo-api-core/src/commonTest/kotlin/com/github/ayastrebov/volvo/api/
+├── core/
+│   ├── CircuitBreakerTest.kt       # Circuit breaker tests (12 tests)
+│   ├── LoggingConfigTest.kt        # Logging config tests (8 tests)
+│   ├── OAuthConfigTest.kt          # OAuth config tests (4 tests)
+│   ├── PkceTest.kt                 # PKCE helper tests (7 tests)
+│   ├── ProxyConfigTest.kt          # Proxy config tests (5 tests)
+│   ├── RetryStrategyTest.kt        # Retry strategy tests (14 tests)
+│   └── TraceparentTest.kt          # Traceparent tests (6 tests)
+├── exception/
+│   └── ExceptionHierarchyTest.kt   # Exception hierarchy tests (7 tests)
+└── model/                          # Serialization tests (52 tests)
 ```
 
 ### Test Dependencies
@@ -156,14 +169,24 @@ volvo-api-client/src/
 | Energy | 2 | 7 |
 | Location | 1 | 6 |
 | Exception Handling | - | 23 |
-| Configuration | - | 12 |
+| Configuration | - | 18 |
 | HTTP Transport | - | 17 |
 | HTTP Client Config | - | 17 |
 | Extension Functions | - | 21 |
 | Retry Behavior | - | 12 |
 | Timeout Behavior | - | 13 |
 | Client (JVM) | - | 5 |
-| **Total** | **28** | **161** |
+| Circuit Breaker | - | 12 |
+| PKCE | - | 7 |
+| Traceparent | - | 6 |
+| OAuth Config | - | 4 |
+| Retry Strategy | - | 14 |
+| Proxy Config | - | 5 |
+| Logging Config | - | 8 |
+| Exception Hierarchy | - | 7 |
+| Serialization | - | 52 |
+| Status Enums | - | 37 |
+| **Total** | **28** | **288** |
 
 ### Writing Tests
 

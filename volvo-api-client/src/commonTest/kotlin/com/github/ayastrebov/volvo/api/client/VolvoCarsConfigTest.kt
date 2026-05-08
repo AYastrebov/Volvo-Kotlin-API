@@ -6,9 +6,12 @@ import com.github.ayastrebov.volvo.api.core.ProxyConfig
 import com.github.ayastrebov.volvo.api.core.RetryStrategy
 import com.github.ayastrebov.volvo.api.http.Timeout
 import com.github.ayastrebov.volvo.api.logging.LogLevel
+import com.github.ayastrebov.volvo.api.core.CircuitBreakerConfig
+import com.github.ayastrebov.volvo.api.core.OAuthConfig
 import kotlin.test.Test
 import kotlin.test.assertIs
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -239,5 +242,100 @@ class VolvoCarsConfigTest {
         assertEquals(5, config.retry.maxRetries)
         assertEquals(2.5, config.retry.base)
         assertEquals(90.seconds, config.retry.maxDelay)
+    }
+
+    // ==================== OAuth / Token Validation ====================
+
+    @Test
+    fun config_withOauth_createsSuccessfully() {
+        val oauth = OAuthConfig(
+            accessToken = "test-access-token",
+            refreshToken = "test-refresh-token",
+            clientId = "test-client-id",
+            clientSecret = "test-client-secret"
+        )
+        val config = VolvoCarsConfig(
+            apiKey = TestData.TEST_API_KEY,
+            oauth = oauth
+        )
+
+        val configOauth = config.oauth
+        assertNotNull(configOauth)
+        assertEquals("test-access-token", configOauth.accessToken)
+        assertNull(config.token)
+    }
+
+    @Test
+    fun config_withToken_createsSuccessfully() {
+        val config = VolvoCarsConfig(
+            apiKey = TestData.TEST_API_KEY,
+            token = TestData.TEST_TOKEN
+        )
+
+        assertEquals(TestData.TEST_TOKEN, config.token)
+        assertNull(config.oauth)
+    }
+
+    @Test
+    fun config_withBothOauthAndToken_throws() {
+        val oauth = OAuthConfig(
+            accessToken = "test-access-token",
+            refreshToken = "test-refresh-token",
+            clientId = "test-client-id",
+            clientSecret = "test-client-secret"
+        )
+
+        assertFailsWith<IllegalArgumentException> {
+            VolvoCarsConfig(
+                apiKey = TestData.TEST_API_KEY,
+                oauth = oauth,
+                token = TestData.TEST_TOKEN
+            )
+        }
+    }
+
+    @Test
+    fun config_withNeitherOauthNorToken_throws() {
+        assertFailsWith<IllegalArgumentException> {
+            VolvoCarsConfig(
+                apiKey = TestData.TEST_API_KEY
+            )
+        }
+    }
+
+    @Test
+    fun config_withOauth_accessTokenReturnsOauthToken() {
+        val oauth = OAuthConfig(
+            accessToken = "test-access-token",
+            refreshToken = "test-refresh-token",
+            clientId = "test-client-id",
+            clientSecret = "test-client-secret"
+        )
+        val config = VolvoCarsConfig(
+            apiKey = TestData.TEST_API_KEY,
+            oauth = oauth
+        )
+
+        assertEquals("test-access-token", config.accessToken)
+    }
+
+    // ==================== Circuit Breaker Configuration ====================
+
+    @Test
+    fun config_withCircuitBreaker_setsConfig() {
+        val cbConfig = CircuitBreakerConfig(
+            failureThreshold = 10,
+            resetTimeout = 90.seconds
+        )
+        val config = VolvoCarsConfig(
+            apiKey = TestData.TEST_API_KEY,
+            token = TestData.TEST_TOKEN,
+            circuitBreaker = cbConfig
+        )
+
+        val cb = config.circuitBreaker
+        assertNotNull(cb)
+        assertEquals(10, cb.failureThreshold)
+        assertEquals(90.seconds, cb.resetTimeout)
     }
 }

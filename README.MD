@@ -24,8 +24,8 @@
 - **Type-Safe** — Kotlin data classes for all request/response models with compile-time safety
 - **OAuth2 Token Refresh** — Automatic access token refresh with Volvo ID refresh token rotation
 - **Coroutine-Based** — Fully asynchronous with Kotlin coroutines
-- **Well-Tested** — 160+ unit tests with mocked HTTP responses + integration tests against real API
-- **Production Ready** — Binary compatibility validation, ProGuard rules, retry with jitter
+- **Well-Tested** — 280+ unit tests with mocked HTTP responses + integration tests against real API
+- **Production Ready** — Circuit breaker, Retry-After parsing, PKCE helper, W3C traceparent, binary compatibility validation, ProGuard rules
 
 ## Installation
 
