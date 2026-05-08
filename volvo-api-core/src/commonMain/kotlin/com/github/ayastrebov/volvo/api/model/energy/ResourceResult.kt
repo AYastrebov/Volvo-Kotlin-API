@@ -49,7 +49,7 @@ public data class ResourceResultFloatWithUnit(
 // ==================== Type-Safe Status Extensions ====================
 
 /**
- * Returns the [status] as a type-safe [ResourceStatus] enum.
+ * Returns the status as a type-safe [ResourceStatus] enum.
  *
  * @return The [ResourceStatus] enum, or [ResourceStatus.UNKNOWN] if not recognized.
  */
@@ -57,7 +57,7 @@ public val ResourceResultString.resourceStatus: ResourceStatus
     get() = ResourceStatus.fromString(status)
 
 /**
- * Returns the [status] as a type-safe [ResourceStatus] enum.
+ * Returns the status as a type-safe [ResourceStatus] enum.
  *
  * @return The [ResourceStatus] enum, or [ResourceStatus.UNKNOWN] if not recognized.
  */
@@ -65,7 +65,7 @@ public val ResourceResultIntegerWithUnit.resourceStatus: ResourceStatus
     get() = ResourceStatus.fromString(status)
 
 /**
- * Returns the [status] as a type-safe [ResourceStatus] enum.
+ * Returns the status as a type-safe [ResourceStatus] enum.
  *
  * @return The [ResourceStatus] enum, or [ResourceStatus.UNKNOWN] if not recognized.
  */
@@ -73,9 +73,9 @@ public val ResourceResultFloatWithUnit.resourceStatus: ResourceStatus
     get() = ResourceStatus.fromString(status)
 
 /**
- * Returns the [value] as a type-safe [ChargerConnectionStatus] enum.
+ * Returns the value as a type-safe [ChargerConnectionStatus] enum.
  *
- * Use this extension when the [ResourceResultString] represents a charger connection status.
+ * Use this when the [ResourceResultString] represents a charger connection status.
  *
  * @return The [ChargerConnectionStatus] enum, or [ChargerConnectionStatus.UNKNOWN] if not recognized.
  */
@@ -83,9 +83,9 @@ public val ResourceResultString.chargerConnectionStatusValue: ChargerConnectionS
     get() = ChargerConnectionStatus.fromString(value)
 
 /**
- * Returns the [value] as a type-safe [ChargingStatus] enum.
+ * Returns the value as a type-safe [ChargingStatus] enum.
  *
- * Use this extension when the [ResourceResultString] represents a charging status.
+ * Use this when the [ResourceResultString] represents a charging status.
  *
  * @return The [ChargingStatus] enum, or [ChargingStatus.UNKNOWN] if not recognized.
  */
@@ -93,9 +93,9 @@ public val ResourceResultString.chargingStatusValue: ChargingStatus
     get() = ChargingStatus.fromString(value)
 
 /**
- * Returns the [value] as a type-safe [ChargingType] enum.
+ * Returns the value as a type-safe [ChargingType] enum.
  *
- * Use this extension when the [ResourceResultString] represents a charging type.
+ * Use this when the [ResourceResultString] represents a charging type.
  *
  * @return The [ChargingType] enum, or [ChargingType.UNKNOWN] if not recognized.
  */

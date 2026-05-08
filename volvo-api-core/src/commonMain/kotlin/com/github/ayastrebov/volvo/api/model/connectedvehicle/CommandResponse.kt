@@ -110,7 +110,7 @@ public data class UnlockInvokeResult(
 ) : BaseInvokeResult
 
 /**
- * Returns the [invokeStatus] as a type-safe [InvokeStatus] enum.
+ * Returns the [BaseInvokeResult.invokeStatus] as a type-safe [InvokeStatus] enum.
  *
  * This provides type-safe access to the invoke status while maintaining
  * backward compatibility with the raw string field.
