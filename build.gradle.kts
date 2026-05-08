@@ -12,7 +12,7 @@ plugins {
 // Dokka configuration for aggregated documentation
 dokka {
     moduleName.set("Volvo Kotlin API")
-    moduleVersion.set(providers.gradleProperty("VolvoApiClientDeployVersion").orElse("0.0.1-SNAPSHOT"))
+    moduleVersion.set(providers.gradleProperty("VolvoApiClientDeployVersion").map { it.removePrefix("v") }.orElse("0.0.1-SNAPSHOT"))
 
     dokkaPublications.html {
         outputDirectory.set(layout.buildDirectory.dir("dokka/html"))
