@@ -41,7 +41,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.ayastrebov.volvo:volvo-api-client:0.5.3")
+    implementation("com.github.ayastrebov.volvo:volvo-api-client:0.5.4")
 }
 ```
 
