@@ -18,7 +18,7 @@ internal suspend inline fun <reified T> FlowCollector<T>.streamEventsFrom(respon
     val channel: ByteReadChannel = response.body()
     try {
         while (currentCoroutineContext().isActive && !channel.isClosedForRead) {
-            val line = channel.readUTF8Line() ?: continue
+            val line = channel.readLine() ?: continue
             val value: T = when {
                 line.startsWith(STREAM_END_TOKEN) -> break
                 line.startsWith(STREAM_PREFIX) -> JsonLenient.decodeFromString(line.removePrefix(STREAM_PREFIX))
