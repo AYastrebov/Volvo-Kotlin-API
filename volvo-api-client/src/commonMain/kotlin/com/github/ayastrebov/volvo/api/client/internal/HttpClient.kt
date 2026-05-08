@@ -6,6 +6,7 @@ import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogLevel
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogger
 import com.github.ayastrebov.volvo.client.ApiConfig
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
@@ -13,9 +14,14 @@ import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.sse.*
+import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.DurationUnit
 
 /**
@@ -25,7 +31,7 @@ import kotlin.time.DurationUnit
  * - **Proxy**: Supports HTTP and SOCKS proxies via [ProxyConfig]
  * - **JSON Serialization**: Lenient parsing with unknown keys ignored
  * - **Logging**: Configurable log level with Authorization header sanitization
- * - **Authentication**: Bearer token authentication (refresh must be handled externally)
+ * - **Authentication**: Bearer token with optional automatic refresh via [OAuthConfig][com.github.ayastrebov.volvo.api.core.OAuthConfig]
  * - **Timeouts**: Configurable socket, connect, and request timeouts
  * - **Retry**: Automatic retry with exponential backoff on rate limit (429) responses
  * - **SSE**: Server-Sent Events support for streaming responses
@@ -63,7 +69,20 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
         install(Auth) {
             bearer {
                 loadTokens {
-                    BearerTokens(accessToken = config.token, refreshToken = "")
+                    BearerTokens(
+                        accessToken = config.token,
+                        refreshToken = config.oauth?.refreshToken ?: ""
+                    )
+                }
+                config.oauth?.let { oauth ->
+                    refreshTokens {
+                        val response = refreshTokenRequest(oauth)
+                        oauth.onTokenRefreshed?.invoke(response.accessToken, response.refreshToken)
+                        BearerTokens(
+                            accessToken = response.accessToken,
+                            refreshToken = response.refreshToken
+                        )
+                    }
                 }
             }
         }
@@ -111,6 +130,40 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
         HttpClient(configuration)
     }
 }
+
+/**
+ * Refreshes the OAuth2 access token using the Volvo ID token endpoint.
+ */
+@OptIn(ExperimentalEncodingApi::class)
+private suspend fun RefreshTokensParams.refreshTokenRequest(
+    oauth: com.github.ayastrebov.volvo.api.core.OAuthConfig
+): TokenResponse {
+    val credentials = Base64.encode("${oauth.clientId}:${oauth.clientSecret}".encodeToByteArray())
+    val response = client.submitForm(
+        url = oauth.tokenUrl,
+        formParameters = parameters {
+            append("grant_type", "refresh_token")
+            append("refresh_token", oldTokens?.refreshToken ?: oauth.refreshToken)
+        }
+    ) {
+        headers {
+            append(HttpHeaders.Authorization, "Basic $credentials")
+        }
+        markAsRefreshTokenRequest()
+    }
+    return response.body()
+}
+
+/**
+ * Token response from the Volvo ID OAuth2 token endpoint.
+ */
+@Serializable
+internal data class TokenResponse(
+    @SerialName("access_token") val accessToken: String,
+    @SerialName("refresh_token") val refreshToken: String,
+    @SerialName("token_type") val tokenType: String = "Bearer",
+    @SerialName("expires_in") val expiresIn: Int = 0,
+)
 
 /**
  * Lenient JSON serializer configured for Volvo API responses.

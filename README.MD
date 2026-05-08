@@ -198,13 +198,27 @@ gpr.token=your-github-token
 
 ### Authentication
 
-The client uses a **static** OAuth2 Bearer token. If the token expires during a long-running session, create a new client with a fresh token:
+By default the client uses a static Bearer token. For long-running sessions, enable **automatic token refresh** by providing OAuth2 credentials:
 
 ```kotlin
-val client = VolvoCars(apiKey = "your-key", token = freshToken)
+val client = VolvoCars(
+    VolvoCarsConfig(
+        apiKey = "your-vcc-api-key",
+        token = "your-access-token",
+        oauth = OAuthConfig(
+            clientId = "your-client-id",
+            clientSecret = "your-client-secret",
+            refreshToken = "your-refresh-token",
+            onTokenRefreshed = { accessToken, refreshToken ->
+                // Persist new tokens — Volvo ID uses refresh token rotation
+                saveTokens(accessToken, refreshToken)
+            }
+        )
+    )
+)
 ```
 
-Automatic token refresh is not supported. Handle token renewal externally (e.g., via your OAuth2 library).
+When `oauth` is configured, the client automatically refreshes the access token on 401 responses using the [Volvo ID token endpoint](https://developer.volvocars.com/apis/docs/authorisation/). Without `oauth`, you must create a new client instance when the token expires.
 
 ### Custom HTTP Configuration
 

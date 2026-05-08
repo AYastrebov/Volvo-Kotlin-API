@@ -1,6 +1,7 @@
 package com.github.ayastrebov.volvo.api.client
 
 import com.github.ayastrebov.volvo.api.core.LoggingConfig
+import com.github.ayastrebov.volvo.api.core.OAuthConfig
 import com.github.ayastrebov.volvo.api.core.ProxyConfig
 import com.github.ayastrebov.volvo.api.core.RetryStrategy
 import com.github.ayastrebov.volvo.api.http.Timeout
@@ -13,6 +14,9 @@ import kotlin.time.Duration.Companion.seconds
  *
  * @property apiKey VCC API key from the [Volvo Developer Portal](https://developer.volvocars.com/)
  * @property token OAuth2 Bearer access token from the Volvo ID identity system
+ * @property oauth Optional OAuth2 configuration for automatic token refresh.
+ *   When provided, the client will automatically refresh expired access tokens
+ *   using the Volvo ID token endpoint. See [OAuthConfig] for details.
  * @property logging HTTP request/response logging configuration
  * @property timeout HTTP timeout configuration for request, connect, and socket timeouts
  * @property headers Additional HTTP headers to include in every request
@@ -24,6 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 public data class VolvoCarsConfig(
     public val apiKey: String,
     public val token: String,
+    public val oauth: OAuthConfig? = null,
     public val logging: LoggingConfig = LoggingConfig(),
     public val timeout: Timeout = Timeout(socket = 30.seconds),
     public val headers: Map<String, String> = emptyMap(),

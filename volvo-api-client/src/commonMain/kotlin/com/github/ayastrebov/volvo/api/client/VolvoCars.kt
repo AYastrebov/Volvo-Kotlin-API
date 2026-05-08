@@ -25,9 +25,10 @@ import kotlin.time.Duration.Companion.seconds
  * Call [close] when done to release underlying HTTP resources.
  * Calling [close] multiple times is safe.
  *
- * **Authentication:** The client uses a static OAuth2 Bearer token. If the token
- * expires, create a new client instance with a fresh token. Automatic token
- * refresh is not supported.
+ * **Authentication:** By default, the client uses a static OAuth2 Bearer token.
+ * For automatic token refresh, provide [OAuthConfig][com.github.ayastrebov.volvo.api.core.OAuthConfig]
+ * with your OAuth2 client credentials. The client will automatically refresh
+ * expired tokens using the Volvo ID token endpoint.
  *
  * ```kotlin
  * val client = VolvoCars(apiKey = "your-key", token = "your-token")
