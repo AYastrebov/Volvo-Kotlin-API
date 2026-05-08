@@ -11,15 +11,15 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Volvo API client configuration.
  *
- * @param apiKey VCC Api Key
- * @param token VCC Access Token
- * @param logging client logging configuration
- * @param timeout http client timeout
- * @param headers extra http headers
- * @param proxy HTTP proxy url
- * @param retry rate limit retry configuration
- * @param engine explicit ktor engine for http requests.
- * @param httpClientConfig additional custom client configuration
+ * @property apiKey VCC API key from the [Volvo Developer Portal](https://developer.volvocars.com/)
+ * @property token OAuth2 Bearer access token from the Volvo ID identity system
+ * @property logging HTTP request/response logging configuration
+ * @property timeout HTTP timeout configuration for request, connect, and socket timeouts
+ * @property headers Additional HTTP headers to include in every request
+ * @property proxy Proxy configuration ([ProxyConfig.Http] or [ProxyConfig.Socks])
+ * @property retry Retry strategy with exponential backoff for transient errors (429, 5xx)
+ * @property engine Explicit Ktor [HttpClientEngine] (useful for testing with mock engines)
+ * @property httpClientConfig Additional Ktor HttpClient configuration block for advanced customization
  */
 public data class VolvoCarsConfig(
     public val apiKey: String,

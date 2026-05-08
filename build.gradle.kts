@@ -19,6 +19,19 @@ dokka {
 
     dokkaPublications.html {
         outputDirectory.set(layout.buildDirectory.dir("dokka/html"))
+        failOnWarning.set(true)
+    }
+
+    dokkaSourceSets.configureEach {
+        externalDocumentationLinks.register("ktor") {
+            url("https://api.ktor.io/")
+        }
+        externalDocumentationLinks.register("kotlinx-coroutines") {
+            url("https://kotlinlang.org/api/kotlinx.coroutines/")
+        }
+        externalDocumentationLinks.register("kotlinx-serialization") {
+            url("https://kotlinlang.org/api/kotlinx.serialization/")
+        }
     }
 
     pluginsConfiguration.html {

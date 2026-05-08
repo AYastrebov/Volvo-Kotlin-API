@@ -7,6 +7,15 @@ import com.github.ayastrebov.volvo.api.model.connectedvehicle.*
  * Connected Vehicle API.
  *
  * Provides access to vehicle status, diagnostics, statistics data and remote commands.
+ * All methods are suspending and require a valid VCC API key and OAuth2 access token.
+ *
+ * All methods in this interface may throw:
+ * @throws com.github.ayastrebov.volvo.api.exception.AuthenticationException if the access token is invalid or expired (401)
+ * @throws com.github.ayastrebov.volvo.api.exception.PermissionException if the API key lacks required permissions (403)
+ * @throws com.github.ayastrebov.volvo.api.exception.RateLimitException if the rate limit is exceeded (429)
+ * @throws com.github.ayastrebov.volvo.api.exception.InvalidRequestException if the request is malformed or the VIN is not found (400/404)
+ * @throws com.github.ayastrebov.volvo.api.exception.VolvoServerException if the Volvo API returns a server error (5xx)
+ * @throws com.github.ayastrebov.volvo.api.exception.VolvoTimeoutException if the request times out
  */
 public interface ConnectedVehicle {
 

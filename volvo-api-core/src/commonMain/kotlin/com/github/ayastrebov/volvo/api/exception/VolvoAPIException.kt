@@ -2,10 +2,19 @@ package com.github.ayastrebov.volvo.api.exception
 
 
 /**
- * Represents an exception thrown when an error occurs while interacting with the Volvo API.
+ * Exception thrown when the Volvo API returns an HTTP error response.
  *
- * @property statusCode the HTTP status code associated with the error.
- * @property error an instance of [VolvoApiError] containing information about the error that occurred.
+ * Subclasses map to specific HTTP status code ranges:
+ * - [AuthenticationException] — 401 Unauthorized
+ * - [PermissionException] — 403 Forbidden
+ * - [RateLimitException] — 429 Too Many Requests
+ * - [InvalidRequestException] — 400, 404, 409, 415
+ * - [UnknownException] — Other 4xx status codes
+ *
+ * @property statusCode The HTTP status code returned by the API.
+ * @property error The parsed error response body with code, message, and details.
+ *
+ * @see VolvoApiError for the error response structure
  */
 public sealed class VolvoAPIException(
     public val statusCode: Int,
@@ -14,7 +23,11 @@ public sealed class VolvoAPIException(
 ) : VolvoException(message = error.detail?.message, throwable = throwable)
 
 /**
- * Represents an exception thrown when the Volvo API rate limit is exceeded.
+ * Exception thrown when the API rate limit is exceeded (HTTP 429).
+ *
+ * Standard rate limits: 100 requests/minute for status endpoints,
+ * 10 requests/minute for command endpoints.
+ * Consider using [com.github.ayastrebov.volvo.api.core.RetryStrategy] for automatic retry with backoff.
  */
 public class RateLimitException(
     statusCode: Int,
@@ -23,7 +36,9 @@ public class RateLimitException(
 ) : VolvoAPIException(statusCode, error, throwable)
 
 /**
- * Represents an exception thrown when an invalid request is made to the Volvo API.
+ * Exception thrown for invalid or malformed API requests (HTTP 400, 404, 409, 415).
+ *
+ * Common causes: invalid VIN, unsupported media type, resource conflict.
  */
 public class InvalidRequestException(
     statusCode: Int,
@@ -32,7 +47,9 @@ public class InvalidRequestException(
 ) : VolvoAPIException(statusCode, error, throwable)
 
 /**
- * Represents an exception thrown when an authentication error occurs while interacting with the Volvo API.
+ * Exception thrown when the access token is invalid or expired (HTTP 401).
+ *
+ * Obtain a new OAuth2 access token via the Volvo ID identity system.
  */
 public class AuthenticationException(
     statusCode: Int,
@@ -41,7 +58,10 @@ public class AuthenticationException(
 ) : VolvoAPIException(statusCode, error, throwable)
 
 /**
- * Represents an exception thrown when a permission error occurs while interacting with the Volvo API.
+ * Exception thrown when the API key lacks required permissions (HTTP 403).
+ *
+ * Verify your VCC API key has the necessary scopes in the
+ * [Volvo Developer Portal](https://developer.volvocars.com/).
  */
 public class PermissionException(
     statusCode: Int,
@@ -50,8 +70,9 @@ public class PermissionException(
 ) : VolvoAPIException(statusCode, error, throwable)
 
 /**
- * Represents an exception thrown when an unknown error occurs while interacting with the Volvo API.
- * This exception is used when the specific type of error is not covered by the existing subclasses.
+ * Exception thrown for API errors not covered by other exception types.
+ *
+ * Check [statusCode] and [error] for details about the specific error.
  */
 public class UnknownException(
     statusCode: Int,

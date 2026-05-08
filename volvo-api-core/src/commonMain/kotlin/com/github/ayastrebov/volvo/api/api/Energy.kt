@@ -9,6 +9,14 @@ import com.github.ayastrebov.volvo.api.model.energy.EnergyStateResponse
  *
  * Provides access to the most recent energy state of a vehicle including
  * battery level, charging status, and electric range.
+ *
+ * All methods in this interface may throw:
+ * @throws com.github.ayastrebov.volvo.api.exception.AuthenticationException if the access token is invalid or expired (401)
+ * @throws com.github.ayastrebov.volvo.api.exception.PermissionException if the API key lacks required permissions (403)
+ * @throws com.github.ayastrebov.volvo.api.exception.RateLimitException if the rate limit is exceeded (429)
+ * @throws com.github.ayastrebov.volvo.api.exception.InvalidRequestException if the request is malformed or the VIN is not found (400/404)
+ * @throws com.github.ayastrebov.volvo.api.exception.VolvoServerException if the Volvo API returns a server error (5xx)
+ * @throws com.github.ayastrebov.volvo.api.exception.VolvoTimeoutException if the request times out
  */
 public interface Energy {
 
