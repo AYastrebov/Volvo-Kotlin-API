@@ -22,8 +22,10 @@
 - **Multiplatform** — Write once, run on Android, JVM, iOS, macOS, Linux, Windows, JS, and WebAssembly
 - **Complete API Coverage** — Connected Vehicle, Energy, and Location APIs
 - **Type-Safe** — Kotlin data classes for all request/response models with compile-time safety
+- **OAuth2 Token Refresh** — Automatic access token refresh with Volvo ID refresh token rotation
 - **Coroutine-Based** — Fully asynchronous with Kotlin coroutines
 - **Well-Tested** — 160+ unit tests with mocked HTTP responses + integration tests against real API
+- **Production Ready** — Binary compatibility validation, ProGuard rules, retry with jitter
 
 ## Installation
 
@@ -121,7 +123,8 @@ Generate API documentation using [Dokka](https://kotlinlang.org/docs/dokka-get-s
 ./gradlew dokkaGenerate
 ```
 
-Output: `build/dokka/html/index.html`
+- **Hosted docs**: [ayastrebov.github.io/Volvo-Kotlin-API](https://ayastrebov.github.io/Volvo-Kotlin-API/)
+- **Local**: `build/dokka/html/index.html`
 
 ## Testing
 
@@ -210,17 +213,19 @@ The client supports two authentication modes:
 
 ### Custom HTTP Configuration
 
-Use `httpClientConfig` to add Ktor plugins for metrics, custom headers, or other advanced scenarios:
+Use `httpClientConfig` in [VolvoCarsConfig] for Ktor plugins (metrics, custom headers, etc.):
 
 ```kotlin
 val client = VolvoCars(
-    apiKey = "your-key",
-    token = "your-token",
-    httpClientConfig = {
-        install(HttpTimeout) {
-            requestTimeoutMillis = 60_000
+    VolvoCarsConfig(
+        apiKey = "your-key",
+        token = "your-test-token",
+        httpClientConfig = {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 60_000
+            }
         }
-    }
+    )
 )
 ```
 

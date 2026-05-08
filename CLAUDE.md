@@ -52,10 +52,12 @@ Android, JVM, iOS (arm64, simulator), macOS (arm64), Linux, Windows, JS (Node.js
 - `com.github.ayastrebov.volvo.api.client.internal.http` - HTTP transport layer
 
 ### Key Packages (volvo-api-core)
-- `com.github.ayastrebov.volvo.api` - Public API interfaces
-- `com.github.ayastrebov.volvo.api.core` - RequestOptions
-- `com.github.ayastrebov.volvo.api.exception` - Exception hierarchy
-- `com.github.ayastrebov.volvo.api.logging` - Logger configuration
+- `com.github.ayastrebov.volvo.api.api` - Public API interfaces (ConnectedVehicle, Energy, Location)
+- `com.github.ayastrebov.volvo.api.core` - RequestOptions, OAuthConfig, RetryStrategy, ProxyConfig, LoggingConfig
+- `com.github.ayastrebov.volvo.api.exception` - Exception hierarchy (sealed VolvoException)
+- `com.github.ayastrebov.volvo.api.logging` - HttpLogger, LogLevel
+- `com.github.ayastrebov.volvo.api.http` - Timeout configuration
+- `com.github.ayastrebov.volvo.api.model` - Request/response data models
 
 ### API Endpoints
 | API | Path |
@@ -73,6 +75,13 @@ Base URL: `https://api.volvocars.com`
 - Explicit API mode enabled for public API verification
 - Internal classes/functions use Kotlin's `internal` visibility modifier
 
+### Authentication
+Two modes via `VolvoCarsConfig` (mutually exclusive, validated at init):
+- **OAuth2** (`oauth: OAuthConfig`): Automatic token refresh via Volvo ID token endpoint. Supports refresh token rotation with `onTokensRefreshed` callback.
+- **Static token** (`token: String`): For testing with test access tokens. No auto-refresh.
+
+Token endpoint: `https://volvoid.eu.volvocars.com/as/token.oauth2`
+
 ### Exception Handling
 Typed exceptions in `com.github.ayastrebov.volvo.api.exception`:
 - `RateLimitException` (429)
@@ -81,6 +90,13 @@ Typed exceptions in `com.github.ayastrebov.volvo.api.exception`:
 - `PermissionException` (403)
 - `VolvoServerException` (5xx)
 - `VolvoTimeoutException` (timeouts)
+
+### Production Features
+- **Binary compatibility validator** (`kotlinx-binary-compatibility-validator`) — `.api` dump files in `api/` directories, checked by `apiCheck` task
+- **Consumer ProGuard rules** — `consumer-rules.pro` in both modules for Android R8 compatibility
+- **Retry with jitter** — Exponential backoff with ±25% randomization to prevent retry storms
+- **Dokka failOnWarning** — KDoc link errors fail the build
+- **External doc links** — Ktor, kotlinx-coroutines, kotlinx-serialization types link to upstream docs
 
 ## Testing
 
@@ -209,27 +225,19 @@ Tests skip automatically when credentials are not configured or when API returns
 
 Uses [Vanniktech Maven Publish Plugin](https://github.com/vanniktech/gradle-maven-publish-plugin) for publishing.
 
-### GitHub Packages
+### GitHub Packages (CI)
 
-Set credentials via environment variables (recommended for CI):
+Automated via `publish.yml` workflow: tag with `v*` to auto-publish + create GitHub Release + deploy Dokka docs.
+
 ```bash
-export GITHUB_ACTOR=your-github-username
-export GITHUB_TOKEN=your-github-token
-export ORG_GRADLE_PROJECT_signingInMemoryKeyId=YOUR_KEY_ID
-export ORG_GRADLE_PROJECT_signingInMemoryKeyPassword=your-key-password
-export ORG_GRADLE_PROJECT_signingInMemoryKey=$(base64 < ~/.gnupg/secring.gpg)
-./gradlew publishAllPublicationsToGitHubPackagesRepository
+git tag v1.0.0 && git push origin v1.0.0
 ```
 
-Or via `local.properties`:
-```properties
-gpr.user=your-github-username
-gpr.token=your-github-token
-```
+Secrets required: `SIGNING_KEY_ID` (RSA), `SIGNING_PASSWORD`, `SIGNING_SECRET_KEY` (base64-encoded).
+Secret key is base64-decoded at runtime in CI (matches KTelegram pattern).
 
 ### Maven Local
 
-Publish to local Maven repository (no signing required):
 ```bash
 ./gradlew publishToMavenLocal
 ```
