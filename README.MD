@@ -5,7 +5,7 @@
 <h1 align="center">Volvo Kotlin API</h1>
 
 <p align="center">
-  <strong>Kotlin Multiplatform library for Volvo Vehicle APIs</strong>
+  <strong>Kotlin Multiplatform client for Volvo Vehicle APIs</strong>
 </p>
 
 <p align="center">
@@ -17,19 +17,13 @@
 
 ---
 
-## Features
+A Kotlin Multiplatform library that wraps the Volvo Connected Vehicle, Energy, and Location APIs. Runs on Android, JVM, iOS, macOS, Linux, Windows, JS, and WebAssembly from a single codebase.
 
-- **Multiplatform** — Write once, run on Android, JVM, iOS, macOS, Linux, Windows, JS, and WebAssembly
-- **Complete API Coverage** — Connected Vehicle, Energy, and Location APIs
-- **Type-Safe** — Kotlin data classes for all request/response models with compile-time safety
-- **OAuth2 Token Refresh** — Automatic access token refresh with Volvo ID refresh token rotation
-- **Coroutine-Based** — Fully asynchronous with Kotlin coroutines
-- **Well-Tested** — 280+ unit tests with mocked HTTP responses + integration tests against real API
-- **Production Ready** — Circuit breaker, Retry-After parsing, PKCE helper, W3C traceparent, binary compatibility validation, ProGuard rules
+Handles OAuth2 token refresh (with Volvo ID's refresh token rotation), retries with jitter, circuit breaking, and typed error mapping. 280+ unit tests, binary compatibility checks, and Android ProGuard rules.
 
 ## Installation
 
-Add the GitHub Packages repository and dependency to your project:
+The library is on GitHub Packages. Add the repository and a Ktor engine for your platform:
 
 ```kotlin
 repositories {
@@ -45,19 +39,19 @@ repositories {
 dependencies {
     implementation("com.github.ayastrebov.volvo:volvo-api-client:0.6.0")
 
-    // Add a Ktor HTTP engine for your platform:
+    // Pick a Ktor engine for your platform:
     implementation("io.ktor:ktor-client-okhttp:3.4.3")    // JVM / Android
     // implementation("io.ktor:ktor-client-darwin:3.4.3")  // iOS / macOS
     // implementation("io.ktor:ktor-client-js:3.4.3")      // JS (Node.js)
 }
 ```
 
-> **Note:** A Ktor HTTP engine is required at runtime. Choose the engine matching your target platform. See [Ktor engines](https://ktor.io/docs/client-engines.html) for all options.
+You need a Ktor engine at runtime. Without one the client crashes on startup. See [Ktor engines](https://ktor.io/docs/client-engines.html) for the full list.
 
-## Quick Start
+## Usage
 
 ```kotlin
-// OAuth2 with automatic token refresh (recommended)
+// With OAuth2 token refresh (recommended for production)
 val client = VolvoCars(
     VolvoCarsConfig(
         apiKey = "your-vcc-api-key",
@@ -67,24 +61,24 @@ val client = VolvoCars(
             clientId = "your-client-id",
             clientSecret = "your-client-secret",
             onTokensRefreshed = { accessToken, refreshToken ->
-                // Persist tokens — Volvo ID rotates refresh tokens on each use
+                // Volvo ID rotates refresh tokens on each use -- persist both
                 tokenStorage.save(accessToken, refreshToken)
             }
         )
     )
 )
 
-// Or with a static token (for testing)
+// Or with a test token (no refresh, expires eventually)
 // val client = VolvoCars(apiKey = "your-key", token = "your-test-token")
 
 val vehicles = client.getVehicleList()
 val location = client.getVehicleLocation("YV1XZ...")
-val lockResponse = client.invokeLock("YV1XZ...")
+client.invokeLock("YV1XZ...")
 
 client.close()
 ```
 
-## Supported Platforms
+## Supported platforms
 
 | Platform | Target |
 |----------|--------|
@@ -97,54 +91,41 @@ client.close()
 | JavaScript | `js` (Node.js) |
 | WebAssembly | `wasmJs` |
 
-## API Coverage
+## API coverage
 
-| API | Description | Endpoints |
+| API | What it does | Endpoints |
 |-----|-------------|-----------|
-| Connected Vehicle | Vehicle info, commands, diagnostics | 25 |
-| Energy | Battery state, charging | 2 |
-| Location | GPS location | 1 |
+| Connected Vehicle | Vehicle info, remote commands, diagnostics | 25 |
+| Energy | Battery level, charging status | 2 |
+| Location | Last known GPS position | 1 |
 
-**Base URL:** `https://api.volvocars.com`
+Base URL: `https://api.volvocars.com`
 
-## Project Structure
+## Project structure
 
 ```
 volvo-api-core/              # Public interfaces, models, exceptions
-volvo-api-client/            # Ktor HTTP client implementation
-volvo-api-integration-tests/ # Integration tests with real API
+volvo-api-client/            # Ktor HTTP implementation
+volvo-api-integration-tests/ # Tests against the real Volvo API
 ```
 
 ## Documentation
 
-Generate API documentation using [Dokka](https://kotlinlang.org/docs/dokka-get-started.html):
+[ayastrebov.github.io/Volvo-Kotlin-API](https://ayastrebov.github.io/Volvo-Kotlin-API/) has the full API reference, generated with Dokka.
 
-```bash
-./gradlew dokkaGenerate
-```
-
-- **Hosted docs**: [ayastrebov.github.io/Volvo-Kotlin-API](https://ayastrebov.github.io/Volvo-Kotlin-API/)
-- **Local**: `build/dokka/html/index.html`
+To build locally: `./gradlew dokkaGenerate` (output in `build/dokka/html/`).
 
 ## Testing
 
 ```bash
-# Run all platform tests
-./gradlew :volvo-api-client:allTests
-
-# Run JVM tests only
-./gradlew :volvo-api-client:jvmTest
-
-# Run Android unit tests
-./gradlew :volvo-api-client:testDebugUnitTest
-
-# Run integration tests (requires credentials)
-./gradlew :volvo-api-integration-tests:test
+./gradlew :volvo-api-client:allTests          # all platforms
+./gradlew :volvo-api-client:jvmTest           # JVM only (fastest)
+./gradlew :volvo-api-integration-tests:test   # real API (needs credentials)
 ```
 
-### Integration Tests
+### Integration tests
 
-Integration tests run against the real Volvo API. Configure credentials via environment variables:
+Integration tests hit the real Volvo API and skip automatically when credentials are missing. Set them via environment variables or `local.properties`:
 
 ```bash
 export VOLVO_API_KEY=your-vcc-api-key
@@ -154,97 +135,65 @@ export VOLVO_TOKEN_ENERGY=your-token
 export VOLVO_TOKEN_LOCATION=your-token
 ```
 
-Or via `local.properties`:
-```properties
-volvo.apiKey=your-vcc-api-key
-volvo.vins=VIN1,VIN2
-volvo.token.connectedVehicle=your-token
-volvo.token.energy=your-token
-volvo.token.location=your-token
-```
-
-Fetch VINs from Volvo API:
-```bash
-./gradlew :volvo-api-integration-tests:fetchVins
-```
-
 <details>
 <summary><strong>Publishing</strong></summary>
 
-### Publish to MavenLocal
+Tag a release to publish automatically:
 
 ```bash
-./gradlew publishToMavenLocal
+git tag v1.0.0 && git push origin v1.0.0
 ```
 
-Artifacts: `~/.m2/repository/com/github/ayastrebov/volvo/`
+This runs tests, publishes to GitHub Packages, creates a GitHub Release, and deploys docs.
 
-### Publish to GitHub Packages
+For local testing: `./gradlew publishToMavenLocal`
 
-```bash
-export GITHUB_ACTOR=your-github-username
-export GITHUB_TOKEN=your-github-token
-./gradlew publishAllPublicationsToGitHubPackagesRepository
-```
-
-Or set in `local.properties`:
-```properties
-gpr.user=your-github-username
-gpr.token=your-github-token
-```
-
-### Version Override
-
-```bash
-./gradlew publish -PVolvoApiClientDeployVersion=1.0.0
-```
+Version override: `./gradlew publish -PVolvoApiClientDeployVersion=1.0.0`
 
 </details>
 
-## Advanced Configuration
+## Authentication
 
-### Authentication
+Two modes, mutually exclusive:
 
-The client supports two authentication modes:
+**OAuth2 with automatic refresh** -- pass `OAuthConfig` with your client credentials. The client calls the [Volvo ID token endpoint](https://developer.volvocars.com/apis/docs/authorisation/) on 401 and rotates the refresh token. Use `onTokensRefreshed` to save both new tokens (Volvo invalidates the old refresh token immediately).
 
-**OAuth2 with automatic refresh (recommended):** Provide `OAuthConfig` with your client credentials. The client automatically refreshes expired tokens via the [Volvo ID token endpoint](https://developer.volvocars.com/apis/docs/authorisation/). Volvo ID uses **refresh token rotation** — each refresh returns a new refresh token and invalidates the old one. Use `onTokensRefreshed` to persist the new tokens.
+**Static token** -- pass `token` directly. Works with [test access tokens](https://developer.volvocars.com/apis/docs/test-access-tokens/) from the Developer Portal. No auto-refresh.
 
-**Static token:** Use `VolvoCars(apiKey, token)` for testing with [test access tokens](https://developer.volvocars.com/apis/docs/test-access-tokens/). The token will not be refreshed automatically.
+## Configuration
 
-### Custom HTTP Configuration
-
-Use `httpClientConfig` in [VolvoCarsConfig] for Ktor plugins (metrics, custom headers, etc.):
+Pass `VolvoCarsConfig` for full control:
 
 ```kotlin
-val client = VolvoCars(
+VolvoCars(
     VolvoCarsConfig(
         apiKey = "your-key",
         token = "your-test-token",
-        httpClientConfig = {
-            install(HttpTimeout) {
-                requestTimeoutMillis = 60_000
-            }
-        }
+        retry = RetryStrategy(maxRetries = 5, maxDelay = 120.seconds),
+        circuitBreaker = CircuitBreakerConfig(failureThreshold = 5, resetTimeout = 30.seconds),
+        logging = LoggingConfig(logLevel = LogLevel.Headers),
+        timeout = Timeout(socket = 30.seconds, connect = 10.seconds),
+        proxy = ProxyConfig.Http("http://proxy.corp.com:8080"),
+        httpClientConfig = { /* extra Ktor config */ }
     )
 )
 ```
 
-## Artifact Verification
+The retry logic parses `Retry-After` headers from 429 responses and falls back to exponential backoff with jitter.
 
-Published artifacts are signed with GPG. To verify signatures, import the public key:
+## Artifact verification
+
+Published artifacts are GPG-signed (key `D0B3B155`):
 
 ```bash
 gpg --keyserver keyserver.ubuntu.com --recv-keys D0B3B155
 ```
 
-Or import manually:
-
 <details>
-<summary>Public Key</summary>
+<summary>Full public key</summary>
 
 ```
 Fingerprint: 7E64 1A77 C010 DEB3 0E77  0A26 E324 0D17 D0B3 B155
-Key ID: D0B3B155
 ```
 
 ```bash
@@ -286,18 +235,16 @@ EOF
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
-
-**Quick start:**
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes and add tests
-4. Ensure all tests pass: `./gradlew allTests`
-5. Open a Pull Request
+2. Create a feature branch
+3. Add tests for your changes
+4. Run `./gradlew allTests` to verify
+5. Open a pull request
 
-Found a bug or have a feature request? [Open an issue](../../issues).
+Found a bug? [Open an issue](../../issues).
 
 ## License
 
-MIT License. See [LICENSE](LICENSE.md) for details.
+MIT. See [LICENSE](LICENSE.md).
