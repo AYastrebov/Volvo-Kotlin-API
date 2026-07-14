@@ -1,6 +1,5 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -42,7 +41,7 @@ kotlin {
     explicitApi()
     jvmToolchain(21)
 
-    androidLibrary {
+    android {
         namespace = "com.github.ayastrebov.volvo.client"
         compileSdk = 36
     }

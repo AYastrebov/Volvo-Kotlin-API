@@ -1,6 +1,6 @@
 [versions]
 
-agp = "8.13.2"
+agp = "9.2.1"
 buildConfig = "6.0.10"
 caupain = "1.9.1"
 dokka = "2.2.0"
