@@ -35,6 +35,12 @@ public data class NewFeatureResponse(
 
 All model fields should be nullable with defaults — the API may omit them. Use `@SerialName` to match the JSON field names exactly.
 
+Check the envelope before you write the wrapper: Connected Vehicle and Location responses are wrapped as above
+(the live Connected Vehicle API sends only `data`; `status`/`operationId` stay null), but Energy v2 returns the
+payload object directly — its interface methods return the model itself, with no `*Response` class. Confirm the
+shape against the spec in `OpenApi/` *and* a real response (see "Verifying models against the live API"); the
+specs lag the API.
+
 ### 2. Add the interface method (volvo-api-core)
 
 Add the suspend function to the appropriate interface in `volvo-api-core/src/commonMain/kotlin/.../api/`:
@@ -81,6 +87,27 @@ fun getNewFeature_returnsData() = runTest {
 ./gradlew apiDump   # regenerate .api files
 ./gradlew build     # verify apiCheck passes
 ```
+
+## Verifying models against the live API
+
+The specs in `OpenApi/` are byte-identical to the developer portal but behind the live API (`/statistics`
+returned 11 numeric fields where the spec lists 5 strings; `/fuel` also returns `batteryChargeLevel`). The
+deserialized objects printed by the integration tests hide this because `ignoreUnknownKeys` drops extra fields.
+When touching a model, diff the raw JSON:
+
+```bash
+# token: https://developer.volvocars.com/apis/docs/test-access-tokens/ (per scope, 30 min); key: local.properties
+curl -s -H "vcc-api-key: $KEY" -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json' \
+  "https://api.volvocars.com/connected-vehicle/v2/vehicles/$VIN/statistics" | jq '.data | keys'
+```
+
+Compare the key set and value types with the `@SerialName`s in the model. Anything the API sends that the model
+lacks is silently dropped; anything non-nullable the API omits throws. Then run the matching integration suite
+with the token in the environment, e.g. `VOLVO_TOKEN_ENERGY=... ./gradlew :volvo-api-integration-tests:test --tests '*EnergyApiTest*'`.
+Put the token in the environment for that command only; never write it to a file in the repo.
+
+`developer.volvocars.com` answers 403 to plain `curl`; the spec pages load with a full Chrome header set and embed
+the OpenAPI JSON in the Next.js RSC payload (`self.__next_f.push` chunks).
 
 ## Adding a new config class (volvo-api-core)
 
@@ -141,10 +168,10 @@ If the circuit breaker is open, `HttpTransport.checkCircuitBreaker()` throws `Ra
 ## OAuth2 flow
 
 Authentication supports two mutually exclusive modes (validated in `VolvoCarsConfig.init`):
-- `oauth: OAuthConfig` — Ktor's bearer auth with `refreshTokens {}` that calls Volvo ID's token endpoint. Uses Basic auth with `client_id:client_secret`. Supports refresh token rotation via `onTokensRefreshed` callback.
+- `oauth: OAuthConfig` — Ktor's bearer auth with `refreshTokens {}` that calls Volvo ID's token endpoint. Client authentication is `client_secret_basic` via Ktor's `basicAuth()`. Supports refresh token rotation via `onTokensRefreshed`; a response without `refresh_token` keeps the previous one. A 400/401/403 from the token endpoint becomes `AuthenticationException` (Volvo ID answers 400 to a stale refresh token).
 - `token: String` — Static bearer token, no refresh.
 
-When modifying auth, remember the token endpoint is `https://volvoid.eu.volvocars.com/as/token.oauth2` and uses `application/x-www-form-urlencoded` with `grant_type=refresh_token`.
+When modifying auth, remember the token endpoint is `https://volvoid.eu.volvocars.com/as/token.oauth2` and uses `application/x-www-form-urlencoded` with `grant_type=refresh_token`. `TokenRefreshTest` covers the 401 → refresh → retry flow against a mock token endpoint; keep it green.
 
 ## Key build commands
 
@@ -152,7 +179,9 @@ When modifying auth, remember the token endpoint is `https://volvoid.eu.volvocar
 ./gradlew build              # build + test + apiCheck
 ./gradlew apiDump            # regenerate binary compatibility .api files
 ./gradlew apiCheck           # verify no breaking API changes
-./gradlew dokkaGenerate      # generate aggregated docs (failOnWarning enabled)
+./gradlew dokkaGenerate      # aggregated docs → build/dokka/html/index.html (failOnWarning enabled)
+./gradlew :volvo-api-core:dokkaGeneratePublicationHtml   # one module → volvo-api-core/build/dokka/html
+./gradlew checkDependencyUpdates --no-configuration-cache # Caupain report → build/reports/dependency-updates.html
 ./gradlew allTests           # multiplatform tests
 ./gradlew :volvo-api-client:jvmTest  # fast JVM-only tests
 ```
@@ -163,7 +192,7 @@ When modifying auth, remember the token endpoint is `https://volvoid.eu.volvocar
 git tag v1.0.0 && git push origin v1.0.0
 ```
 
-This triggers the `publish.yml` workflow which runs tests, publishes to GitHub Packages (with version from tag), creates a GitHub Release, and deploys Dokka docs to GitHub Pages. GPG signing uses RSA key (D0B3B155) stored base64-encoded in secrets.
+This triggers the `publish.yml` workflow which runs tests, publishes to GitHub Packages (with version from tag), creates a GitHub Release, and deploys Dokka docs to GitHub Pages. GPG signing uses RSA key (D0B3B155) stored base64-encoded in secrets (`SIGNING_KEY_ID`, `SIGNING_PASSWORD`, `SIGNING_SECRET_KEY`). Locally: `./gradlew publishToMavenLocal`, or `./gradlew publish -PVolvoApiClientDeployVersion=1.0.0` to override the version. Module/package docs for Dokka live in `volvo-api-core/MODULE.md` and `volvo-api-client/MODULE.md`.
 
 ## Things to watch out for
 
@@ -173,3 +202,7 @@ This triggers the `publish.yml` workflow which runs tests, publishes to GitHub P
 - **`failOnWarning`** on Dokka — broken KDoc links fail the build. Use fully qualified names for extension property references
 - **Consumer ProGuard rules** — update `consumer-rules.pro` if adding new `@Serializable` model packages
 - **KMP target coverage** — code in `commonMain` must compile for all 9 targets (Android, JVM, iOS arm64, iOS simulator, macOS, Linux, Windows, JS, WasmJS)
+- **`headers { }` in a request builder** needs `io.ktor.client.request.*` imported; otherwise it is the `io.ktor.http.headers` factory and the header is built and discarded. Prefer `header()`, `basicAuth()`, `bearerAuth()`. This bug hid in the token refresh for months.
+- **Default headers** in `createHttpClient` use `appendIfNameAbsent`; Ktor's `DefaultRequest` otherwise keeps both the request's and the default's value.
+- **Scopes** — every interface method's KDoc lists its `Required scopes:`; keep `docs/authorization.md` in sync when adding one.
+- **Test counts** — don't record them in docs; they go stale with every change.
