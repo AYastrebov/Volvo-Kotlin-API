@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Kotlin-2.3.21-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin 2.3.21"/>
+  <img src="https://img.shields.io/badge/Kotlin-2.4.21-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin 2.4.21"/>
   <img src="https://img.shields.io/badge/JDK-21-orange" alt="JDK 21"/>
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License MIT"/>
   <img src="https://img.shields.io/badge/Platforms-Android%20%7C%20JVM%20%7C%20iOS%20%7C%20macOS%20%7C%20Linux%20%7C%20Windows%20%7C%20JS%20%7C%20Wasm-lightgrey" alt="Platforms"/>
@@ -19,7 +19,7 @@
 
 A Kotlin Multiplatform library that wraps the Volvo Connected Vehicle, Energy, and Location APIs. Runs on Android, JVM, iOS, macOS, Linux, Windows, JS, and WebAssembly from a single codebase.
 
-Handles OAuth2 token refresh (with Volvo ID's refresh token rotation), retries with jitter, circuit breaking, and typed error mapping. 280+ unit tests, binary compatibility checks, and Android ProGuard rules.
+It refreshes OAuth2 tokens (including Volvo ID's refresh token rotation), retries with jitter, has a circuit breaker and maps API errors to typed exceptions. The public API is checked for binary compatibility on every build, and consumer ProGuard rules ship for Android.
 
 ## Installation
 
@@ -40,9 +40,9 @@ dependencies {
     implementation("com.github.ayastrebov.volvo:volvo-api-client:0.7.0")
 
     // Pick a Ktor engine for your platform:
-    implementation("io.ktor:ktor-client-okhttp:3.4.3")    // JVM / Android
-    // implementation("io.ktor:ktor-client-darwin:3.4.3")  // iOS / macOS
-    // implementation("io.ktor:ktor-client-js:3.4.3")      // JS (Node.js)
+    implementation("io.ktor:ktor-client-okhttp:3.6.0")    // JVM / Android
+    // implementation("io.ktor:ktor-client-darwin:3.6.0")  // iOS / macOS
+    // implementation("io.ktor:ktor-client-js:3.6.0")      // JS (Node.js)
 }
 ```
 
@@ -61,7 +61,7 @@ val client = VolvoCars(
             clientId = "your-client-id",
             clientSecret = "your-client-secret",
             onTokensRefreshed = { accessToken, refreshToken ->
-                // Volvo ID rotates refresh tokens on each use -- persist both
+                // Volvo ID may rotate the refresh token; persist both
                 tokenStorage.save(accessToken, refreshToken)
             }
         )
@@ -156,9 +156,10 @@ Version override: `./gradlew publish -PVolvoApiClientDeployVersion=1.0.0`
 
 Two modes, mutually exclusive:
 
-**OAuth2 with automatic refresh** -- pass `OAuthConfig` with your client credentials. The client calls the [Volvo ID token endpoint](https://developer.volvocars.com/apis/docs/authorisation/) on 401 and rotates the refresh token. Use `onTokensRefreshed` to save both new tokens (Volvo invalidates the old refresh token immediately).
+- OAuth2 with automatic refresh: pass `OAuthConfig` with your client credentials. On a 401 the client calls the [Volvo ID token endpoint](https://developer.volvocars.com/apis/docs/authorisation/) and retries the request. Volvo ID may return a new refresh token with each refresh, so save both tokens in `onTokensRefreshed`. A refresh token Volvo ID no longer accepts raises `AuthenticationException`.
+- Static token: pass `token` directly. Works with [test access tokens](https://developer.volvocars.com/apis/docs/test-access-tokens/) from the Developer Portal. No refresh.
 
-**Static token** -- pass `token` directly. Works with [test access tokens](https://developer.volvocars.com/apis/docs/test-access-tokens/) from the Developer Portal. No auto-refresh.
+Each endpoint needs its own OAuth scope. The full list is in [docs/authorization.md](docs/authorization.md), and every API method's KDoc names the scopes it needs.
 
 ## Configuration
 
