@@ -31,6 +31,7 @@ class LocationApiTest {
         assertEquals("Feature", response.data?.type)
         assertNotNull(response.data?.properties)
         assertEquals("125", response.data?.properties?.get("heading"))
+        assertEquals(125, response.data?.heading)
 
         // GeoJSON Point geometry
         assertNotNull(response.data?.geometry)

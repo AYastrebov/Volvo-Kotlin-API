@@ -109,26 +109,4 @@ class EnergySerializationTest {
         assertEquals(true, energyState.isSupported)
         assertEquals(true, energyState.batteryChargeLevel?.isSupported)
     }
-
-    @Test
-    fun energyStateResponse_serializesAndDeserializes() {
-        val original = EnergyStateResponse(
-            status = 200,
-            operationId = "test-op-id",
-            data = EnergyState(
-                batteryChargeLevel = ResourceResultFloatWithUnit(
-                    status = "OK",
-                    value = 78.5f,
-                    unit = "%"
-                )
-            )
-        )
-
-        val serialized = json.encodeToString(EnergyStateResponse.serializer(), original)
-        val deserialized = json.decodeFromString(EnergyStateResponse.serializer(), serialized)
-
-        assertEquals(original.status, deserialized.status)
-        assertEquals(original.operationId, deserialized.operationId)
-        assertEquals(original.data?.batteryChargeLevel?.value, deserialized.data?.batteryChargeLevel?.value)
-    }
 }

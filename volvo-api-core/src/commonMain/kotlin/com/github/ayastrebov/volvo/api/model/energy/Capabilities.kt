@@ -4,17 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Vehicle capabilities response.
- */
-@Serializable
-public data class CapabilitiesResponse(
-    @SerialName("status") val status: Int? = null,
-    @SerialName("operationId") val operationId: String? = null,
-    @SerialName("data") val data: Capabilities? = null
-)
-
-/**
  * Summary of supported endpoints and data points for a vehicle.
+ *
+ * Unlike the Connected Vehicle and Location APIs, the Energy API v2 returns this object
+ * directly as the response body, without a `status`/`operationId`/`data` envelope.
  */
 @Serializable
 public data class Capabilities(

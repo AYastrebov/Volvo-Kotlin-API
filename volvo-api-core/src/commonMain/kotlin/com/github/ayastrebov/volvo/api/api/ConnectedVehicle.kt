@@ -24,6 +24,8 @@ public interface ConnectedVehicle {
     /**
      * Get list of vehicles associated with the user.
      *
+     * Required scopes: `openid` and `conve:vehicle_relation`.
+     *
      * @param requestOptions optional request configuration
      * @return list of vehicle VINs
      */
@@ -33,6 +35,8 @@ public interface ConnectedVehicle {
 
     /**
      * Get vehicle details including model, year, fuel type, etc.
+     *
+     * Required scopes: `openid` and `conve:vehicle_relation`.
      *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
@@ -48,6 +52,8 @@ public interface ConnectedVehicle {
     /**
      * Get window status for all windows.
      *
+     * Required scopes: `openid` and `conve:windows_status`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return window status
@@ -59,6 +65,8 @@ public interface ConnectedVehicle {
 
     /**
      * Get vehicle warnings (bulb failures, etc.).
+     *
+     * Required scopes: `openid` and `conve:warnings`.
      *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
@@ -72,6 +80,8 @@ public interface ConnectedVehicle {
     /**
      * Get tyre pressure status for all tyres.
      *
+     * Required scopes: `openid` and `conve:tyre_status`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return tyre pressure values
@@ -83,6 +93,8 @@ public interface ConnectedVehicle {
 
     /**
      * Get vehicle statistics (average speed, trip meters, etc.).
+     *
+     * Required scopes: `openid` and `conve:trip_statistics`.
      *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
@@ -96,6 +108,8 @@ public interface ConnectedVehicle {
     /**
      * Get odometer value in kilometers.
      *
+     * Required scopes: `openid` and `conve:odometer_status`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return odometer value
@@ -107,6 +121,8 @@ public interface ConnectedVehicle {
 
     /**
      * Get fuel amount in liters.
+     *
+     * Required scopes: `openid` and `conve:fuel_status`, plus `conve:battery_charge_level` for the battery level.
      *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
@@ -120,6 +136,8 @@ public interface ConnectedVehicle {
     /**
      * Get engine diagnostic values (oil level, coolant level warnings).
      *
+     * Required scopes: `openid` and `conve:diagnostics_engine_status`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return engine diagnostics
@@ -131,6 +149,8 @@ public interface ConnectedVehicle {
 
     /**
      * Get door and lock status.
+     *
+     * Required scopes: `openid` and `conve:doors_status`, `conve:lock_status`.
      *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
@@ -144,6 +164,8 @@ public interface ConnectedVehicle {
     /**
      * Get vehicle diagnostics (service warnings, washer fluid, etc.).
      *
+     * Required scopes: `openid` and `conve:diagnostics_workshop`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return diagnostics values
@@ -156,6 +178,8 @@ public interface ConnectedVehicle {
     /**
      * Get brake status.
      *
+     * Required scopes: `openid` and `conve:brake_status`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return brake status
@@ -167,6 +191,8 @@ public interface ConnectedVehicle {
 
     /**
      * Get engine running status.
+     *
+     * Required scopes: `openid` and `conve:engine_status`.
      *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
@@ -182,6 +208,8 @@ public interface ConnectedVehicle {
     /**
      * Get list of available commands for the vehicle.
      *
+     * Required scopes: `openid` and `conve:commands`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return list of available commands
@@ -193,6 +221,8 @@ public interface ConnectedVehicle {
 
     /**
      * Get command accessibility status.
+     *
+     * Required scopes: `openid` and `conve:command_accessibility`.
      *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
@@ -208,6 +238,8 @@ public interface ConnectedVehicle {
     /**
      * Send unlock command to the vehicle.
      *
+     * Required scopes: `openid` and `conve:unlock`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return command response
@@ -219,6 +251,8 @@ public interface ConnectedVehicle {
 
     /**
      * Send lock command to the vehicle.
+     *
+     * Required scopes: `openid` and `conve:lock`.
      *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
@@ -232,6 +266,8 @@ public interface ConnectedVehicle {
     /**
      * Send honk command to the vehicle.
      *
+     * Required scopes: `openid` and `conve:honk_flash`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return command response
@@ -243,6 +279,8 @@ public interface ConnectedVehicle {
 
     /**
      * Send flash lights command to the vehicle.
+     *
+     * Required scopes: `openid` and `conve:honk_flash`.
      *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
@@ -256,6 +294,8 @@ public interface ConnectedVehicle {
     /**
      * Send honk and flash command to the vehicle.
      *
+     * Required scopes: `openid` and `conve:honk_flash`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return command response
@@ -268,6 +308,8 @@ public interface ConnectedVehicle {
     /**
      * Send engine stop command to the vehicle.
      *
+     * Required scopes: `openid` and `conve:engine_start_stop`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return command response
@@ -279,6 +321,8 @@ public interface ConnectedVehicle {
 
     /**
      * Send engine start command to the vehicle.
+     *
+     * Required scopes: `openid` and `conve:engine_start_stop`.
      *
      * @param vin Vehicle Identification Number
      * @param request engine start configuration
@@ -294,6 +338,8 @@ public interface ConnectedVehicle {
     /**
      * Send climatization stop command to the vehicle.
      *
+     * Required scopes: `openid` and `conve:climatization_start_stop`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return command response
@@ -306,6 +352,8 @@ public interface ConnectedVehicle {
     /**
      * Send climatization start command to the vehicle.
      *
+     * Required scopes: `openid` and `conve:climatization_start_stop`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return command response
@@ -317,6 +365,8 @@ public interface ConnectedVehicle {
 
     /**
      * Send lock with reduced guard command to the vehicle.
+     *
+     * Required scopes: `openid` and `conve:lock`.
      *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration

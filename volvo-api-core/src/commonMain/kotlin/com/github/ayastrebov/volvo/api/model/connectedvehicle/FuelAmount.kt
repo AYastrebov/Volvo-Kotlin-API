@@ -15,9 +15,16 @@ public data class FuelAmountResponse(
 )
 
 /**
- * Fuel amount value in liters.
+ * Fuel and battery levels.
+ *
+ * The published specification only lists [fuelAmount]; the live API also returns
+ * [batteryChargeLevel] (scope `conve:battery_charge_level`) for hybrids and electric vehicles.
  */
 @Serializable
 public data class FuelAmount(
-    @SerialName("fuelAmount") val fuelAmount: ValueWithTimestamp<Double>? = null
+    /** Remaining fuel, in liters. */
+    @SerialName("fuelAmount") val fuelAmount: ValueWithTimestamp<Double>? = null,
+
+    /** High-voltage battery charge level, in percent. */
+    @SerialName("batteryChargeLevel") val batteryChargeLevel: ValueWithTimestamp<Double>? = null
 )

@@ -154,8 +154,20 @@ println("Lat: ${coords?.latitude}, Lon: ${coords?.longitude}")
 // Fuel level
 val fuel = client.getFuelAmount(vin)
 
-// Battery / charging (electric/hybrid)
+// Battery / charging (electric/hybrid). Energy API v2 has no status/operationId/data
+// envelope: the payload is returned directly. Each resource carries its own status.
 val energy = client.getEnergyState(vin)
+val battery = energy.batteryChargeLevel
+if (battery?.status == "OK") println("Battery: ${battery.value} ${battery.unit}")
+else println("Battery unavailable: ${battery?.code} ${battery?.message}")
+
+// Check support first on unknown vehicles
+val capabilities = client.getCapabilities(vin)
+val supportsEnergy = capabilities.getEnergyState?.isSupported == true
+
+// Can the car receive remote commands right now?
+val accessibility = client.getCommandAccessibility(vin).data?.availabilityStatus
+println("${accessibility?.value} ${accessibility?.unavailableReason ?: ""}")
 
 // Door & lock status
 val doors = client.getDoorAndLockStatus(vin)
@@ -182,8 +194,10 @@ client.invokeHonk(vin)
 client.invokeFlash(vin)
 client.invokeHonkFlash(vin)
 
-// Engine
-client.invokeEngineStart(vin, EngineStartRequest(duration = 15))
+// Engine (runtimeMinutes must be 0-15; the constructor rejects other values)
+val result = client.invokeEngineStart(vin, EngineStartRequest(runtimeMinutes = 15))
+if (result.data?.status?.isSuccess == true) println("Engine started")
+else println("Engine start ${result.data?.invokeStatus}: ${result.data?.message}")
 client.invokeEngineStop(vin)
 
 // Climatization
@@ -193,18 +207,22 @@ client.invokeClimatizationStop(vin)
 
 ### Distributed tracing
 
-Include a W3C traceparent header for end-to-end observability:
+Every request carries a freshly generated W3C `traceparent` header. To tie a call into your own
+trace, pass one explicitly and it replaces the generated value:
 
 ```kotlin
 val trace = Traceparent.generate()
 val location = client.getVehicleLocation(
     vin = vin,
     requestOptions = RequestOptions(
-        headers = mapOf("traceparent" to trace.value)
+        headers = mapOf(Traceparent.HEADER to trace.value)
     )
 )
 println("Trace ID: ${trace.traceId}")
 ```
+
+Headers that should go on every request (for example a correlation id) belong in
+`VolvoCarsConfig(headers = mapOf(...))`; they override the built-in defaults such as `User-Agent`.
 
 ## Error handling
 
@@ -233,9 +251,15 @@ try {
 Access error details:
 ```kotlin
 catch (e: VolvoAPIException) {
-    println("HTTP ${e.statusCode}: ${e.error.detail?.message}")
+    // Connected Vehicle / Location: message + description; Energy: code + message + details[]
+    println("HTTP ${e.statusCode}: ${e.error.detail?.message} ${e.error.detail?.description ?: ""}")
+    // Quote operationId when contacting Volvo support
+    println("operationId: ${e.error.operationId}")
 }
 ```
+
+A refresh token that Volvo ID no longer accepts (it answers 400) surfaces as `AuthenticationException`,
+so one catch covers both an expired access token and a dead refresh token.
 
 ## Advanced configuration
 
@@ -333,19 +357,35 @@ The client is thread-safe — safe to share across coroutines.
 
 ## Available scopes
 
-Each API endpoint requires specific OAuth2 scopes. Common ones:
+Each API method needs its own OAuth2 scope; a token without it gets a 403 (`PermissionException`).
+The same mapping is in each method's KDoc. Verified against the live API with per-scope test tokens.
 
-| Scope | Access |
+| Scope | Grants |
 |-------|--------|
-| `openid` | Required for all requests |
-| `conve:vehicle_relation` | Vehicle list |
-| `conve:commands` | List available commands |
-| `conve:lock` | Lock/unlock |
-| `conve:engine_status` | Engine status |
-| `conve:doors_status` | Door status |
-| `conve:windows_status` | Window status |
-| `energy:capability:read` | Energy capabilities |
-| `energy:state:read` | Energy state |
+| `openid` | Required with every other scope |
+| `conve:vehicle_relation` | `getVehicleList`, `getVehicleDetails` |
+| `conve:windows_status` | `getWindowStatus` |
+| `conve:warnings` | `getWarnings` |
+| `conve:tyre_status` | `getTyreStatus` |
+| `conve:trip_statistics` | `getStatistics` |
+| `conve:odometer_status` | `getOdometer` |
+| `conve:fuel_status` | `getFuelAmount` (`fuelAmount`) |
+| `conve:battery_charge_level` | `getFuelAmount` (`batteryChargeLevel`) |
+| `conve:diagnostics_engine_status` | `getEngineDiagnostics` |
+| `conve:doors_status`, `conve:lock_status` | `getDoorAndLockStatus` |
+| `conve:diagnostics_workshop` | `getDiagnostics` |
+| `conve:brake_status` | `getBrakeStatus` |
+| `conve:engine_status` | `getEngineStatus` |
+| `conve:commands` | `getCommandList` |
+| `conve:command_accessibility` | `getCommandAccessibility` |
+| `conve:lock` | `invokeLock`, `invokeLockReducedGuard` |
+| `conve:unlock` | `invokeUnlock` |
+| `conve:honk_flash` | `invokeHonk`, `invokeFlash`, `invokeHonkFlash` |
+| `conve:engine_start_stop` | `invokeEngineStart`, `invokeEngineStop` |
+| `conve:climatization_start_stop` | `invokeClimatizationStart`, `invokeClimatizationStop` |
+| `energy:capability:read` | `getCapabilities` |
+| `energy:state:read` | `getEnergyState` (the per-resource `energy:*` scopes work too) |
+| `location:read` | `getVehicleLocation` |
 
 Request all scopes your app needs during the initial OAuth2 authorization.
 

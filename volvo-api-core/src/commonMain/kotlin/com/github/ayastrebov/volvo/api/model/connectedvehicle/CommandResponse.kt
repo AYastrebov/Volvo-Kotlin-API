@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  *
  * All command invocation results share common properties:
  * - [vin]: Vehicle Identification Number
- * - [invokeStatus]: Current status of the command (e.g., "RUNNING", "COMPLETED", "FAILED")
+ * - [invokeStatus]: Current status of the command (e.g., "RUNNING", "COMPLETED", "REJECTED")
  * - [message]: Optional message providing additional details
  *
  * @see InvokeResult for standard command results
@@ -22,10 +22,11 @@ public interface BaseInvokeResult {
     /**
      * Current status of the command invocation.
      *
-     * Known values:
+     * Known values (see [InvokeStatus] for the full list):
      * - "RUNNING" - Command is being executed
      * - "COMPLETED" - Command executed successfully
-     * - "FAILED" - Command execution failed
+     * - "SUCCESS" / "DELIVERED" - Command reached the vehicle
+     * - "REJECTED", "TIMEOUT", "CAR_ERROR", ... - Command failed
      */
     public val invokeStatus: String?
 
@@ -58,7 +59,7 @@ public data class CommandResponse(
  * Contains the common result fields for most vehicle commands.
  *
  * @property vin Vehicle Identification Number.
- * @property invokeStatus Current status ("RUNNING", "COMPLETED", "FAILED").
+ * @property invokeStatus Current status, see [InvokeStatus] for known values.
  * @property message Optional details about the command execution.
  */
 @Serializable
@@ -94,7 +95,7 @@ public data class UnlockCommandResponse(
  * the unlock readiness state.
  *
  * @property vin Vehicle Identification Number.
- * @property invokeStatus Current status ("RUNNING", "COMPLETED", "FAILED").
+ * @property invokeStatus Current status, see [InvokeStatus] for known values.
  * @property message Optional details about the command execution.
  * @property readyToUnlock Whether the vehicle is ready to be unlocked.
  * @property readyToUnlockUntil Timestamp (in milliseconds since epoch) until which

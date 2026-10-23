@@ -1,14 +1,18 @@
 package com.github.ayastrebov.volvo.api.api
 
 import com.github.ayastrebov.volvo.api.core.RequestOptions
-import com.github.ayastrebov.volvo.api.model.energy.CapabilitiesResponse
-import com.github.ayastrebov.volvo.api.model.energy.EnergyStateResponse
+import com.github.ayastrebov.volvo.api.model.energy.Capabilities
+import com.github.ayastrebov.volvo.api.model.energy.EnergyState
 
 /**
  * Energy API.
  *
  * Provides access to the most recent energy state of a vehicle including
  * battery level, charging status, and electric range.
+ *
+ * Note: unlike the Connected Vehicle and Location APIs, Energy API v2 responses are not
+ * wrapped in a `status`/`operationId`/`data` envelope, so these methods return the
+ * payload objects directly.
  *
  * All methods in this interface may throw:
  * @throws com.github.ayastrebov.volvo.api.exception.AuthenticationException if the access token is invalid or expired (401)
@@ -25,14 +29,16 @@ public interface Energy {
      *
      * Provides a summary of the supported endpoints and data points for a vehicle.
      *
+     * Required scopes: `openid` and `energy:capability:read`; the per-resource `energy:*` scopes work as well.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
-     * @return capabilities response
+     * @return vehicle energy capabilities
      */
     public suspend fun getCapabilities(
         vin: String,
         requestOptions: RequestOptions? = null
-    ): CapabilitiesResponse
+    ): Capabilities
 
     /**
      * Get the latest energy state of the vehicle.
@@ -40,12 +46,14 @@ public interface Energy {
      * Provides the latest energy state data for the vehicle including battery charge level,
      * electric range, charging status, and other energy-related information.
      *
+     * Required scopes: `openid` and `energy:state:read`; the per-resource `energy:*` scopes work as well.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
-     * @return energy state response
+     * @return latest energy state
      */
     public suspend fun getEnergyState(
         vin: String,
         requestOptions: RequestOptions? = null
-    ): EnergyStateResponse
+    ): EnergyState
 }

@@ -5,7 +5,9 @@ import kotlin.time.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 /**
  * Serialization round-trip tests for Connected Vehicle domain models.
@@ -157,11 +159,10 @@ class SerializationTest {
             status = 200,
             operationId = "test-op-id",
             data = CommandAccessibility(
-                availableCommands = listOf(
-                    AvailableCommand(command = "LOCK", href = "/commands/lock")
-                ),
-                unavailableCommands = listOf(
-                    UnavailableCommand(command = "ENGINE_START", reason = "NOT_SUPPORTED")
+                availabilityStatus = AvailabilityStatus(
+                    value = "UNAVAILABLE",
+                    unavailableReason = "CAR_IN_USE",
+                    timestamp = Instant.parse("2024-01-15T10:30:00Z")
                 )
             )
         )
@@ -169,7 +170,40 @@ class SerializationTest {
         val serialized = json.encodeToString(CommandAccessibilityResponse.serializer(), original)
         val deserialized = json.decodeFromString(CommandAccessibilityResponse.serializer(), serialized)
 
-        assertEquals(original.data?.availableCommands?.size, deserialized.data?.availableCommands?.size)
-        assertEquals(original.data?.unavailableCommands?.size, deserialized.data?.unavailableCommands?.size)
+        assertEquals(original, deserialized)
+    }
+
+    @Test
+    fun commandAccessibility_deserializesApiPayload() {
+        val payload = """
+            {"status":200,"operationId":"op","data":{"availabilityStatus":{"value":"AVAILABLE","timestamp":"2024-01-15T10:30:00Z"}}}
+        """.trimIndent()
+
+        val response = json.decodeFromString(CommandAccessibilityResponse.serializer(), payload)
+
+        val availability = response.data?.availabilityStatus
+        assertNotNull(availability)
+        assertEquals("AVAILABLE", availability.value)
+        assertNull(availability.unavailableReason)
+        assertEquals(Instant.parse("2024-01-15T10:30:00Z"), availability.timestamp)
+    }
+
+    @Test
+    fun valueWithTimestamp_toleratesMissingValue() {
+        val deserialized = json.decodeFromString(
+            ValueWithTimestamp.serializer(kotlinx.serialization.serializer<Int>()),
+            """{"timestamp":"2024-01-15T10:30:00Z","unit":"km"}"""
+        )
+
+        assertNull(deserialized.value)
+        assertEquals("km", deserialized.unit)
+    }
+
+    @Test
+    fun engineStartRequest_rejectsRuntimeOutsideApiRange() {
+        assertFailsWith<IllegalArgumentException> { EngineStartRequest(runtimeMinutes = -1) }
+        assertFailsWith<IllegalArgumentException> { EngineStartRequest(runtimeMinutes = 16) }
+        assertEquals(0, EngineStartRequest(runtimeMinutes = 0).runtimeMinutes)
+        assertEquals(15, EngineStartRequest(runtimeMinutes = 15).runtimeMinutes)
     }
 }

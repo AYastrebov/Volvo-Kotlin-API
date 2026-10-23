@@ -1,5 +1,6 @@
 package com.github.ayastrebov.volvo.api.model.connectedvehicle
 
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -15,27 +16,25 @@ public data class CommandAccessibilityResponse(
 
 /**
  * Command accessibility status.
+ *
+ * Tells whether the vehicle can currently receive remote commands.
  */
 @Serializable
 public data class CommandAccessibility(
-    @SerialName("availableCommands") val availableCommands: List<AvailableCommand>? = null,
-    @SerialName("unavailableCommands") val unavailableCommands: List<UnavailableCommand>? = null
+    @SerialName("availabilityStatus") val availabilityStatus: AvailabilityStatus? = null
 )
 
 /**
- * Available command with its accessibility status.
+ * Whether the vehicle is reachable for remote commands.
+ *
+ * @property value Availability value, e.g. `AVAILABLE` or `UNAVAILABLE`.
+ * @property unavailableReason Reason the vehicle is unavailable, present when [value] is `UNAVAILABLE`
+ *                             (e.g. `CAR_IN_USE`, `NO_INTERNET`, `POWER_SAVING_MODE`).
+ * @property timestamp Instant when the availability was last evaluated.
  */
 @Serializable
-public data class AvailableCommand(
-    @SerialName("command") val command: String? = null,
-    @SerialName("href") val href: String? = null
-)
-
-/**
- * Unavailable command with reason.
- */
-@Serializable
-public data class UnavailableCommand(
-    @SerialName("command") val command: String? = null,
-    @SerialName("reason") val reason: String? = null
+public data class AvailabilityStatus(
+    @SerialName("value") val value: String? = null,
+    @SerialName("unavailableReason") val unavailableReason: String? = null,
+    @SerialName("timestamp") val timestamp: Instant? = null
 )

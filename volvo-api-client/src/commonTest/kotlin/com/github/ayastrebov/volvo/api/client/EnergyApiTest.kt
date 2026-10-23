@@ -7,10 +7,14 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
  * Tests for Energy API endpoints.
+ *
+ * Energy API v2 returns the payload directly, without the status/operationId/data envelope
+ * used by the Connected Vehicle and Location APIs.
  */
 class EnergyApiTest {
 
@@ -20,16 +24,14 @@ class EnergyApiTest {
     fun getCapabilities_returnsVehicleCapabilities() = runTest {
         val client = createTestClientWithResponse(EnergyFixtures.capabilitiesResponse)
 
-        val response = client.getCapabilities(TestData.TEST_VIN)
+        val capabilities = client.getCapabilities(TestData.TEST_VIN)
 
-        assertEquals(200, response.status)
-        assertEquals(TestData.TEST_OPERATION_ID, response.operationId)
-        assertNotNull(response.data)
-        assertNotNull(response.data?.getEnergyState)
-        assertEquals(true, response.data?.getEnergyState?.isSupported)
-        assertEquals(true, response.data?.getEnergyState?.batteryChargeLevel?.isSupported)
-        assertEquals(true, response.data?.getEnergyState?.electricRange?.isSupported)
-        assertEquals(false, response.data?.getEnergyState?.chargingPower?.isSupported)
+        val energyState = capabilities.getEnergyState
+        assertNotNull(energyState)
+        assertEquals(true, energyState.isSupported)
+        assertEquals(true, energyState.batteryChargeLevel?.isSupported)
+        assertEquals(true, energyState.electricRange?.isSupported)
+        assertEquals(false, energyState.chargingPower?.isSupported)
     }
 
     @Test
@@ -39,10 +41,9 @@ class EnergyApiTest {
             headers = mapOf("X-Custom-Header" to "test-value")
         )
 
-        val response = client.getCapabilities(TestData.TEST_VIN, options)
+        val capabilities = client.getCapabilities(TestData.TEST_VIN, options)
 
-        assertEquals(200, response.status)
-        assertNotNull(response.data)
+        assertNotNull(capabilities.getEnergyState)
     }
 
     // ==================== Energy State ====================
@@ -51,72 +52,66 @@ class EnergyApiTest {
     fun getEnergyState_returnsEnergyStateData() = runTest {
         val client = createTestClientWithResponse(EnergyFixtures.energyStateResponse)
 
-        val response = client.getEnergyState(TestData.TEST_VIN)
-
-        assertEquals(200, response.status)
-        assertEquals(TestData.TEST_OPERATION_ID, response.operationId)
-        assertNotNull(response.data)
+        val state = client.getEnergyState(TestData.TEST_VIN)
 
         // Battery charge level
-        assertNotNull(response.data?.batteryChargeLevel)
-        assertEquals("OK", response.data?.batteryChargeLevel?.status)
-        assertEquals(78.5f, response.data?.batteryChargeLevel?.value)
-        assertEquals("percent", response.data?.batteryChargeLevel?.unit)
+        assertNotNull(state.batteryChargeLevel)
+        assertEquals("OK", state.batteryChargeLevel?.status)
+        assertEquals(78.5f, state.batteryChargeLevel?.value)
+        assertEquals("percent", state.batteryChargeLevel?.unit)
 
         // Electric range
-        assertNotNull(response.data?.electricRange)
-        assertEquals("OK", response.data?.electricRange?.status)
-        assertEquals(285, response.data?.electricRange?.value)
-        assertEquals("km", response.data?.electricRange?.unit)
+        assertNotNull(state.electricRange)
+        assertEquals("OK", state.electricRange?.status)
+        assertEquals(285, state.electricRange?.value)
+        assertEquals("km", state.electricRange?.unit)
 
         // Charger connection status
-        assertNotNull(response.data?.chargerConnectionStatus)
-        assertEquals("OK", response.data?.chargerConnectionStatus?.status)
-        assertEquals("CONNECTED", response.data?.chargerConnectionStatus?.value)
+        assertNotNull(state.chargerConnectionStatus)
+        assertEquals("OK", state.chargerConnectionStatus?.status)
+        assertEquals("CONNECTED", state.chargerConnectionStatus?.value)
 
         // Charging status
-        assertNotNull(response.data?.chargingStatus)
-        assertEquals("OK", response.data?.chargingStatus?.status)
-        assertEquals("CHARGING", response.data?.chargingStatus?.value)
+        assertNotNull(state.chargingStatus)
+        assertEquals("OK", state.chargingStatus?.status)
+        assertEquals("CHARGING", state.chargingStatus?.value)
 
         // Charging type
-        assertNotNull(response.data?.chargingType)
-        assertEquals("AC", response.data?.chargingType?.value)
+        assertNotNull(state.chargingType)
+        assertEquals("AC", state.chargingType?.value)
 
         // Estimated charging time
-        assertNotNull(response.data?.estimatedChargingTimeToTargetBatteryChargeLevel)
-        assertEquals(120, response.data?.estimatedChargingTimeToTargetBatteryChargeLevel?.value)
-        assertEquals("minutes", response.data?.estimatedChargingTimeToTargetBatteryChargeLevel?.unit)
+        assertNotNull(state.estimatedChargingTimeToTargetBatteryChargeLevel)
+        assertEquals(120, state.estimatedChargingTimeToTargetBatteryChargeLevel?.value)
+        assertEquals("minutes", state.estimatedChargingTimeToTargetBatteryChargeLevel?.unit)
 
         // Target battery charge level
-        assertNotNull(response.data?.targetBatteryChargeLevel)
-        assertEquals(80, response.data?.targetBatteryChargeLevel?.value)
+        assertNotNull(state.targetBatteryChargeLevel)
+        assertEquals(80, state.targetBatteryChargeLevel?.value)
 
         // Charging current limit
-        assertNotNull(response.data?.chargingCurrentLimit)
-        assertEquals(16, response.data?.chargingCurrentLimit?.value)
-        assertEquals("ampere", response.data?.chargingCurrentLimit?.unit)
+        assertNotNull(state.chargingCurrentLimit)
+        assertEquals(16, state.chargingCurrentLimit?.value)
+        assertEquals("ampere", state.chargingCurrentLimit?.unit)
     }
 
     @Test
     fun getEnergyState_withErrorStatus_handlesErrorGracefully() = runTest {
         val client = createTestClientWithResponse(EnergyFixtures.energyStateErrorResponse)
 
-        val response = client.getEnergyState(TestData.TEST_VIN)
-
-        assertEquals(200, response.status)
-        assertNotNull(response.data)
+        val state = client.getEnergyState(TestData.TEST_VIN)
 
         // Battery charge level should have ERROR status
-        assertNotNull(response.data?.batteryChargeLevel)
-        assertEquals("ERROR", response.data?.batteryChargeLevel?.status)
-        assertEquals("DATA_NOT_AVAILABLE", response.data?.batteryChargeLevel?.code)
-        assertEquals("Data is temporarily unavailable", response.data?.batteryChargeLevel?.message)
+        assertNotNull(state.batteryChargeLevel)
+        assertEquals("ERROR", state.batteryChargeLevel?.status)
+        assertEquals("DATA_NOT_AVAILABLE", state.batteryChargeLevel?.code)
+        assertEquals("Data is temporarily unavailable", state.batteryChargeLevel?.message)
+        assertNull(state.batteryChargeLevel?.value)
 
         // Electric range should have OK status
-        assertNotNull(response.data?.electricRange)
-        assertEquals("OK", response.data?.electricRange?.status)
-        assertEquals(285, response.data?.electricRange?.value)
+        assertNotNull(state.electricRange)
+        assertEquals("OK", state.electricRange?.status)
+        assertEquals(285, state.electricRange?.value)
     }
 
     @Test
@@ -126,10 +121,9 @@ class EnergyApiTest {
             headers = mapOf("X-Custom-Header" to "test-value")
         )
 
-        val response = client.getEnergyState(TestData.TEST_VIN, options)
+        val state = client.getEnergyState(TestData.TEST_VIN, options)
 
-        assertEquals(200, response.status)
-        assertNotNull(response.data)
+        assertNotNull(state.batteryChargeLevel)
     }
 
     // ==================== Request Verification ====================

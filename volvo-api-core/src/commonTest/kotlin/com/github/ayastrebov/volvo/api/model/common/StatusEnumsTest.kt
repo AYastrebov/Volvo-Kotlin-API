@@ -2,6 +2,8 @@ package com.github.ayastrebov.volvo.api.model.common
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Tests for status enum parsing and type safety.
@@ -23,8 +25,27 @@ class StatusEnumsTest {
     }
 
     @Test
-    fun invokeStatus_parsesFailed() {
-        assertEquals(InvokeStatus.FAILED, InvokeStatus.fromString("FAILED"))
+    fun invokeStatus_parsesEverySpecValue() {
+        val specValues = listOf(
+            "WAITING", "RUNNING", "COMPLETED", "REJECTED", "UNKNOWN", "TIMEOUT", "CONNECTION_FAILURE",
+            "VEHICLE_IN_SLEEP", "UNLOCK_TIME_FRAME_PASSED", "UNABLE_TO_LOCK_DOOR_OPEN", "EXPIRED", "SENT",
+            "NOT_SUPPORTED", "CAR_IN_SLEEP_MODE", "DELIVERED", "DELIVERY_TIMEOUT", "SUCCESS", "CAR_TIMEOUT",
+            "CAR_ERROR", "NOT_ALLOWED_PRIVACY_ENABLED", "NOT_ALLOWED_WRONG_USAGE_MODE", "INVOCATION_SPECIFIC_ERROR",
+        )
+        for (value in specValues) {
+            assertEquals(value, InvokeStatus.fromString(value).name, "Spec value $value should parse to itself")
+        }
+        assertEquals(specValues.size, InvokeStatus.entries.size)
+    }
+
+    @Test
+    fun invokeStatus_successAndPendingHelpers() {
+        assertTrue(InvokeStatus.SUCCESS.isSuccess)
+        assertTrue(InvokeStatus.COMPLETED.isSuccess)
+        assertFalse(InvokeStatus.REJECTED.isSuccess)
+        assertTrue(InvokeStatus.WAITING.isPending)
+        assertTrue(InvokeStatus.DELIVERED.isPending)
+        assertFalse(InvokeStatus.CAR_ERROR.isPending)
     }
 
     @Test
@@ -112,6 +133,20 @@ class StatusEnumsTest {
     fun chargingType_unknownReturnsUnknown() {
         assertEquals(ChargingType.UNKNOWN, ChargingType.fromString("INVALID"))
         assertEquals(ChargingType.UNKNOWN, ChargingType.fromString(null))
+    }
+
+    // ==================== ChargerPowerStatus ====================
+
+    @Test
+    fun chargerPowerStatus_parsesKnownValues() {
+        assertEquals(ChargerPowerStatus.PROVIDING_POWER, ChargerPowerStatus.fromString("PROVIDING_POWER"))
+        assertEquals(ChargerPowerStatus.NO_POWER_AVAILABLE, ChargerPowerStatus.fromString("no_power_available"))
+    }
+
+    @Test
+    fun chargerPowerStatus_unknownReturnsUnknown() {
+        assertEquals(ChargerPowerStatus.UNKNOWN, ChargerPowerStatus.fromString("INVALID"))
+        assertEquals(ChargerPowerStatus.UNKNOWN, ChargerPowerStatus.fromString(null))
     }
 
     // ==================== ResourceStatus ====================

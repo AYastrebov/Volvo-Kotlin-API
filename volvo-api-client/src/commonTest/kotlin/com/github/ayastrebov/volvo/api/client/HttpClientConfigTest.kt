@@ -1,16 +1,21 @@
 package com.github.ayastrebov.volvo.api.client
 
+import com.github.ayastrebov.volvo.api.client.internal.createHttpClient
+import com.github.ayastrebov.volvo.api.client.test.ConnectedVehicleFixtures
 import com.github.ayastrebov.volvo.api.client.test.MockResponse
 import com.github.ayastrebov.volvo.api.client.test.RequestCapturingMockEngine
 import com.github.ayastrebov.volvo.api.client.test.TestData
 import com.github.ayastrebov.volvo.api.client.test.createTestConfig
 import com.github.ayastrebov.volvo.api.core.LoggingConfig
+import com.github.ayastrebov.volvo.api.core.RequestOptions
+import com.github.ayastrebov.volvo.api.core.Traceparent
 import com.github.ayastrebov.volvo.api.core.ProxyConfig
 import com.github.ayastrebov.volvo.api.core.RetryStrategy
 import com.github.ayastrebov.volvo.api.http.Timeout
 import com.github.ayastrebov.volvo.api.logging.HttpLogger
 import com.github.ayastrebov.volvo.api.logging.LogLevel
 import io.ktor.client.engine.mock.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -256,5 +261,54 @@ class HttpClientConfigTest {
         )
 
         assertNull(config.engine)
+    }
+
+    // ==================== Default Headers ====================
+
+    @Test
+    fun configHeaders_areSentOnEveryRequest() = runTest {
+        val capturingEngine = RequestCapturingMockEngine(MockResponse(HttpStatusCode.OK, "{}"))
+        val config = createTestConfig(capturingEngine.engine).copy(
+            headers = mapOf("X-Custom" to "custom-value", HttpHeaders.UserAgent to "my-app/1.0")
+        )
+
+        val client = createHttpClient(config)
+        client.get("https://api.volvocars.com/test")
+        client.get("https://api.volvocars.com/test")
+
+        assertEquals(2, capturingEngine.requests.size)
+        capturingEngine.requests.forEach { request ->
+            assertEquals("custom-value", request.headers["X-Custom"])
+            // Configured headers override the built-in defaults
+            assertEquals("my-app/1.0", request.headers[HttpHeaders.UserAgent])
+            assertEquals(TestData.TEST_API_KEY, request.headers["vcc-api-key"])
+        }
+    }
+
+    @Test
+    fun traceparent_isGeneratedPerRequest() = runTest {
+        val capturingEngine = RequestCapturingMockEngine(MockResponse(HttpStatusCode.OK, "{}"))
+        val client = createHttpClient(createTestConfig(capturingEngine.engine))
+
+        client.get("https://api.volvocars.com/test")
+        client.get("https://api.volvocars.com/test")
+
+        val traceparents = capturingEngine.requests.map { it.headers[Traceparent.HEADER] }
+        val format = Regex("^00-[0-9a-f]{32}-[0-9a-f]{16}-01$")
+        traceparents.forEach { assertTrue(it != null && format.matches(it), "Bad traceparent: $it") }
+        assertEquals(2, traceparents.toSet().size, "Each request should get its own trace")
+    }
+
+    @Test
+    fun traceparent_fromRequestOptions_takesPrecedence() = runTest {
+        val capturingEngine = RequestCapturingMockEngine(
+            MockResponse(HttpStatusCode.OK, ConnectedVehicleFixtures.vehicleListResponse)
+        )
+        val client = VolvoCars(createTestConfig(capturingEngine.engine))
+        val own = Traceparent.generate()
+
+        client.getVehicleList(RequestOptions(headers = mapOf(Traceparent.HEADER to own.value)))
+
+        assertEquals(listOf(own.value), capturingEngine.requests.single().headers.getAll(Traceparent.HEADER))
     }
 }

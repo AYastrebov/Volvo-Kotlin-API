@@ -100,13 +100,31 @@ class ConnectedVehicleApiTest {
 
         val response = client.getStatistics(TestData.TEST_VIN)
 
+        val stats = assertNotNull(response.data)
+        assertEquals(7.2374, stats.averageFuelConsumption?.value)
+        assertEquals(50.0, stats.averageSpeed?.value)
+        assertEquals(66.0, stats.averageSpeedAutomatic?.value)
+        assertEquals(2.2374, stats.averageEnergyConsumption?.value)
+        assertEquals(1312.0, stats.distanceToEmptyTank?.value)
+        assertEquals(200.0, stats.distanceToEmptyBattery?.value)
+        assertEquals(420.0, stats.tripMeterAutomatic?.value)
+        assertEquals(500.0, stats.tripMeterManual?.value)
+        assertEquals("km", stats.tripMeterManual?.unit)
+    }
+
+    @Test
+    fun getStatistics_acceptsSpecificationShapeWithStringValues() = runTest {
+        val client = createTestClientWithResponse(ConnectedVehicleFixtures.statisticsSpecResponse)
+
+        val response = client.getStatistics(TestData.TEST_VIN)
+
         assertEquals(200, response.status)
-        assertNotNull(response.data)
-        assertEquals("5.2", response.data?.averageFuelConsumption?.value)
-        assertEquals("45", response.data?.averageSpeed?.value)
-        assertEquals("1250", response.data?.tripMeter1?.value)
-        assertEquals("560", response.data?.tripMeter2?.value)
-        assertEquals("450", response.data?.distanceToEmpty?.value)
+        val stats = assertNotNull(response.data)
+        assertEquals(5.2, stats.averageFuelConsumption?.value)
+        assertEquals(45.0, stats.averageSpeed?.value)
+        assertEquals(1250.0, stats.tripMeter1?.value)
+        assertEquals(560.0, stats.tripMeter2?.value)
+        assertEquals(450.0, stats.distanceToEmpty?.value)
     }
 
     @Test
@@ -130,7 +148,9 @@ class ConnectedVehicleApiTest {
         assertEquals(200, response.status)
         assertNotNull(response.data)
         assertEquals(45.5, response.data?.fuelAmount?.value)
-        assertEquals("liters", response.data?.fuelAmount?.unit)
+        assertEquals("l", response.data?.fuelAmount?.unit)
+        assertEquals(42.0, response.data?.batteryChargeLevel?.value)
+        assertEquals("%", response.data?.batteryChargeLevel?.unit)
     }
 
     @Test
@@ -217,12 +237,23 @@ class ConnectedVehicleApiTest {
         val response = client.getCommandAccessibility(TestData.TEST_VIN)
 
         assertEquals(200, response.status)
-        assertNotNull(response.data)
-        assertNotNull(response.data?.availableCommands)
-        assertEquals(2, response.data?.availableCommands?.size)
-        assertNotNull(response.data?.unavailableCommands)
-        assertEquals(1, response.data?.unavailableCommands?.size)
-        assertEquals("NOT_SUPPORTED", response.data?.unavailableCommands?.first()?.reason)
+        val availability = response.data?.availabilityStatus
+        assertNotNull(availability)
+        assertEquals("AVAILABLE", availability.value)
+        assertEquals(null, availability.unavailableReason)
+        assertNotNull(availability.timestamp)
+    }
+
+    @Test
+    fun getCommandAccessibility_exposesUnavailableReason() = runTest {
+        val client = createTestClientWithResponse(ConnectedVehicleFixtures.commandAccessibilityUnavailableResponse)
+
+        val response = client.getCommandAccessibility(TestData.TEST_VIN)
+
+        val availability = response.data?.availabilityStatus
+        assertNotNull(availability)
+        assertEquals("UNAVAILABLE", availability.value)
+        assertEquals("CAR_IN_USE", availability.unavailableReason)
     }
 
     // ==================== Command Invocations ====================

@@ -143,21 +143,34 @@ All new applications enforce [PKCE](https://oauth.net/2/pkce/) for security agai
 
 Each API endpoint requires specific scopes for end-user consent. Scopes needed for an endpoint are specified in that endpoint's documentation.
 
-### Common Scopes
+### Scopes per method
 
-| Scope | Description |
-|-------|-------------|
-| `openid` | Required for all requests |
-| `conve:vehicle_relation` | Access to vehicle list |
-| `conve:commands` | List available commands |
-| `conve:lock` | Lock/unlock commands |
-| `conve:engine_status` | Engine status data |
-| `conve:doors_status` | Door status data |
-| `conve:windows_status` | Window status data |
-| `energy:capability:read` | Energy capabilities |
-| `energy:state:read` | Energy state data |
-
-See individual API documentation for complete scope lists.
+| Scope | Grants |
+|-------|--------|
+| `openid` | Required with every other scope |
+| `conve:vehicle_relation` | `getVehicleList`, `getVehicleDetails` |
+| `conve:windows_status` | `getWindowStatus` |
+| `conve:warnings` | `getWarnings` |
+| `conve:tyre_status` | `getTyreStatus` |
+| `conve:trip_statistics` | `getStatistics` |
+| `conve:odometer_status` | `getOdometer` |
+| `conve:fuel_status` | `getFuelAmount` (`fuelAmount`) |
+| `conve:battery_charge_level` | `getFuelAmount` (`batteryChargeLevel`) |
+| `conve:diagnostics_engine_status` | `getEngineDiagnostics` |
+| `conve:doors_status`, `conve:lock_status` | `getDoorAndLockStatus` |
+| `conve:diagnostics_workshop` | `getDiagnostics` |
+| `conve:brake_status` | `getBrakeStatus` |
+| `conve:engine_status` | `getEngineStatus` |
+| `conve:commands` | `getCommandList` |
+| `conve:command_accessibility` | `getCommandAccessibility` |
+| `conve:lock` | `invokeLock`, `invokeLockReducedGuard` |
+| `conve:unlock` | `invokeUnlock` |
+| `conve:honk_flash` | `invokeHonk`, `invokeFlash`, `invokeHonkFlash` |
+| `conve:engine_start_stop` | `invokeEngineStart`, `invokeEngineStop` |
+| `conve:climatization_start_stop` | `invokeClimatizationStart`, `invokeClimatizationStop` |
+| `energy:capability:read` | `getCapabilities` |
+| `energy:state:read` | `getEnergyState` (the per-resource `energy:*` scopes work too) |
+| `location:read` | `getVehicleLocation` |
 
 ## Sample Implementation
 

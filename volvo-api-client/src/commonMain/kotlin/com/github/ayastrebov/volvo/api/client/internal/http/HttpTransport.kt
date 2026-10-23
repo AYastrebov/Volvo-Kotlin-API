@@ -13,6 +13,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.io.IOException
 
 /** HTTP transport layer with optional circuit breaker. */
+/** Response header carrying Volvo's identifier for the request; quote it when contacting Volvo support. */
+internal const val OPERATION_ID_HEADER = "vcc-api-operationid"
+
 internal class HttpTransport(
     private val httpClient: HttpClient,
     private val circuitBreaker: CircuitBreaker? = null,
@@ -79,6 +82,7 @@ internal class HttpTransport(
      */
     private suspend fun handleException(e: Throwable) = when (e) {
         is CancellationException -> e // propagate coroutine cancellation
+        is VolvoException -> e // already mapped, e.g. by the token refresh handler
         is ClientRequestException -> volvoAPIException(e)
         is ServerResponseException -> VolvoServerException(e)
         is HttpRequestTimeoutException, is SocketTimeoutException, is ConnectTimeoutException -> VolvoTimeoutException(
@@ -100,11 +104,16 @@ internal class HttpTransport(
     private suspend fun volvoAPIException(exception: ClientRequestException): VolvoAPIException {
         val response = exception.response
         val status = response.status.value
-        val error = try {
+        val parsed = try {
             response.body<VolvoApiError>()
         } catch (e: Exception) {
             VolvoApiError(detail = VolvoErrorDetails(message = response.status.description))
         }
+        // The live API reports the operation id in a response header rather than in the body.
+        val error = parsed.copy(
+            status = parsed.status ?: status,
+            operationId = parsed.operationId ?: response.headers[OPERATION_ID_HEADER],
+        )
         return when (status) {
             401 -> AuthenticationException(status, error, exception)
             403 -> PermissionException(status, error, exception)

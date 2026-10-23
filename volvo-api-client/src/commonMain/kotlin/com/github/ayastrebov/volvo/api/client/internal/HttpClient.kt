@@ -1,9 +1,16 @@
 package com.github.ayastrebov.volvo.api.client.internal
 
 import com.github.ayastrebov.volvo.api.client.VolvoCarsConfig
-import com.github.ayastrebov.volvo.api.core.ProxyConfig
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogLevel
 import com.github.ayastrebov.volvo.api.client.internal.extension.toKtorLogger
+import com.github.ayastrebov.volvo.api.core.OAuthConfig
+import com.github.ayastrebov.volvo.api.core.ProxyConfig
+import com.github.ayastrebov.volvo.api.core.Traceparent
+import com.github.ayastrebov.volvo.api.exception.AuthenticationException
+import com.github.ayastrebov.volvo.api.exception.InvalidRequestException
+import com.github.ayastrebov.volvo.api.exception.VolvoApiError
+import com.github.ayastrebov.volvo.api.exception.VolvoErrorDetails
+import com.github.ayastrebov.volvo.api.exception.VolvoException
 import com.github.ayastrebov.volvo.client.ApiConfig
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -13,15 +20,15 @@ import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
-import io.ktor.client.plugins.sse.*
+import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.*
+import io.ktor.util.*
+import io.ktor.util.date.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.math.pow
 import kotlin.time.DurationUnit
 
@@ -32,11 +39,10 @@ import kotlin.time.DurationUnit
  * - **Proxy**: Supports HTTP and SOCKS proxies via [ProxyConfig]
  * - **JSON Serialization**: Lenient parsing with unknown keys ignored
  * - **Logging**: Configurable log level with Authorization header sanitization
- * - **Authentication**: Bearer token with optional automatic refresh via [OAuthConfig][com.github.ayastrebov.volvo.api.core.OAuthConfig]
+ * - **Authentication**: Bearer token with optional automatic refresh via [OAuthConfig]
  * - **Timeouts**: Configurable socket, connect, and request timeouts
- * - **Retry**: Automatic retry with exponential backoff on rate limit (429) responses
- * - **SSE**: Server-Sent Events support for streaming responses
- * - **Headers**: User-Agent and VCC API key automatically included
+ * - **Retry**: Automatic retry with exponential backoff, honouring `Retry-After` (seconds or HTTP date)
+ * - **Headers**: User-Agent, VCC API key, a per-request `traceparent` and any [VolvoCarsConfig.headers]
  *
  * `expectSuccess = true` ensures non-2xx responses throw exceptions for proper error handling.
  *
@@ -78,10 +84,12 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
                 config.oauth?.let { oauth ->
                     refreshTokens {
                         val response = refreshTokenRequest(oauth)
-                        oauth.onTokensRefreshed?.invoke(response.accessToken, response.refreshToken)
+                        // Volvo ID may omit refresh_token when it does not rotate it; keep using the old one then.
+                        val refreshToken = response.refreshToken ?: oldTokens?.refreshToken ?: oauth.refreshToken
+                        oauth.onTokensRefreshed?.invoke(response.accessToken, refreshToken)
                         BearerTokens(
                             accessToken = response.accessToken,
-                            refreshToken = response.refreshToken
+                            refreshToken = refreshToken
                         )
                     }
                 }
@@ -106,7 +114,7 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
             retryIf { _, response ->
                 val shouldRetry = response.status.value in config.retry.retryOnStatusCodes
                 if (shouldRetry) {
-                    retryAfterMs = (response.headers[HttpHeaders.RetryAfter]?.toLongOrNull() ?: 0) * 1000
+                    retryAfterMs = response.headers[HttpHeaders.RetryAfter].toRetryAfterMillis()
                 }
                 shouldRetry
             }
@@ -124,13 +132,15 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
             }
         }
 
-        install(SSE)
-
+        // Runs for every request. The builder already holds the request's own headers, so
+        // appendIfNameAbsent gives precedence: RequestOptions > VolvoCarsConfig.headers > built-in defaults.
         defaultRequest {
             url(ApiConfig.API_URL)
             headers {
-                append(HttpHeaders.UserAgent, "VolvoCars-Kotlin-Client/${ApiConfig.VERSION}")
-                append("vcc-api-key", config.apiKey)
+                config.headers.forEach { (name, value) -> appendIfNameAbsent(name, value) }
+                appendIfNameAbsent(HttpHeaders.UserAgent, "VolvoCars-Kotlin-Client/${ApiConfig.VERSION}")
+                appendIfNameAbsent("vcc-api-key", config.apiKey)
+                appendIfNameAbsent(Traceparent.HEADER, Traceparent.generate().value)
             }
         }
 
@@ -147,26 +157,58 @@ internal fun createHttpClient(config: VolvoCarsConfig): HttpClient {
 }
 
 /**
- * Refreshes the OAuth2 access token using the Volvo ID token endpoint.
+ * Parses a `Retry-After` header, which is either a delay in seconds or an HTTP date.
+ *
+ * @return the delay in milliseconds, or 0 when the header is absent, unparseable or in the past
  */
-@OptIn(ExperimentalEncodingApi::class)
-private suspend fun RefreshTokensParams.refreshTokenRequest(
-    oauth: com.github.ayastrebov.volvo.api.core.OAuthConfig
-): TokenResponse {
-    val credentials = Base64.encode("${oauth.clientId}:${oauth.clientSecret}".encodeToByteArray())
-    val response = client.submitForm(
-        url = oauth.tokenUrl,
-        formParameters = parameters {
-            append("grant_type", "refresh_token")
-            append("refresh_token", oldTokens?.refreshToken ?: oauth.refreshToken)
+internal fun String?.toRetryAfterMillis(): Long {
+    if (this == null) return 0
+    toLongOrNull()?.let { return it * 1000 }
+    return runCatching { fromHttpToGmtDate().timestamp - GMTDate().timestamp }
+        .getOrDefault(0L)
+        .coerceAtLeast(0L)
+}
+
+/**
+ * Refreshes the OAuth2 access token using the Volvo ID token endpoint.
+ *
+ * Volvo ID answers a stale or revoked refresh token with 400, so 400/401/403 from the token
+ * endpoint surface as [AuthenticationException] rather than a generic invalid request.
+ */
+private suspend fun RefreshTokensParams.refreshTokenRequest(oauth: OAuthConfig): TokenResponse {
+    val response = try {
+        client.submitForm(
+            url = oauth.tokenUrl,
+            formParameters = parameters {
+                append("grant_type", "refresh_token")
+                append("refresh_token", oldTokens?.refreshToken ?: oauth.refreshToken)
+            }
+        ) {
+            // client_secret_basic. Note: this must be the request builder's header(), not the
+            // top-level io.ktor.http.headers {} factory, which would build and discard a Headers object.
+            basicAuth(username = oauth.clientId, password = oauth.clientSecret)
+            markAsRefreshTokenRequest()
         }
-    ) {
-        headers {
-            append(HttpHeaders.Authorization, "Basic $credentials")
-        }
-        markAsRefreshTokenRequest()
+    } catch (e: ClientRequestException) {
+        throw e.toTokenRefreshException()
     }
     return response.body()
+}
+
+private suspend fun ClientRequestException.toTokenRefreshException(): VolvoException {
+    val status = response.status.value
+    val oauthError = runCatching { response.body<OAuthErrorResponse>() }.getOrNull()
+    val error = VolvoApiError(
+        status = status,
+        detail = VolvoErrorDetails(
+            code = oauthError?.error,
+            message = "Token refresh failed: ${oauthError?.errorDescription ?: oauthError?.error ?: response.status.description}",
+        )
+    )
+    return when (status) {
+        400, 401, 403 -> AuthenticationException(status, error, this)
+        else -> InvalidRequestException(status, error, this)
+    }
 }
 
 /**
@@ -175,9 +217,18 @@ private suspend fun RefreshTokensParams.refreshTokenRequest(
 @Serializable
 internal data class TokenResponse(
     @SerialName("access_token") val accessToken: String,
-    @SerialName("refresh_token") val refreshToken: String,
+    @SerialName("refresh_token") val refreshToken: String? = null,
     @SerialName("token_type") val tokenType: String = "Bearer",
     @SerialName("expires_in") val expiresIn: Int = 0,
+)
+
+/**
+ * Error body from the OAuth2 token endpoint (RFC 6749 §5.2).
+ */
+@Serializable
+internal data class OAuthErrorResponse(
+    @SerialName("error") val error: String? = null,
+    @SerialName("error_description") val errorDescription: String? = null,
 )
 
 /**

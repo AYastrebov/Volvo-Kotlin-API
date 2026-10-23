@@ -179,7 +179,7 @@ VolvoCars(
 )
 ```
 
-The retry logic parses `Retry-After` headers from 429 responses and falls back to exponential backoff with jitter.
+The retry logic honours `Retry-After` headers (as seconds or an HTTP date) and falls back to exponential backoff with jitter.
 
 ## Artifact verification
 

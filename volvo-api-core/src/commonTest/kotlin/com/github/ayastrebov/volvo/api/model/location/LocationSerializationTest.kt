@@ -1,8 +1,10 @@
 package com.github.ayastrebov.volvo.api.model.location
 
+import kotlin.time.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertNotNull
 
 /**
@@ -104,5 +106,21 @@ class LocationSerializationTest {
         assertEquals(original.data?.type, deserialized.data?.type)
         assertEquals(original.data?.geometry?.longitude, deserialized.data?.geometry?.longitude)
         assertEquals(original.data?.geometry?.latitude, deserialized.data?.geometry?.latitude)
+    }
+
+    @Test
+    fun feature_exposesTypedHeadingAndTimestamp() {
+        val feature = Feature(
+            type = "Feature",
+            properties = mapOf("heading" to "286", "timestamp" to "2026-10-23T18:49:36.232257796Z")
+        )
+
+        assertEquals(286, feature.heading)
+        assertEquals(Instant.parse("2026-10-23T18:49:36.232257796Z"), feature.timestamp)
+
+        val malformed = Feature(properties = mapOf("heading" to "north", "timestamp" to "yesterday"))
+        assertNull(malformed.heading)
+        assertNull(malformed.timestamp)
+        assertNull(Feature().heading)
     }
 }

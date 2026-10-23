@@ -274,7 +274,7 @@ class HttpTransportTest {
     fun errorResponse_preservesErrorDetails() = runTest {
         val mockEngine = MockEngine {
             respond(
-                content = """{"error": {"code": "INVALID_VIN", "message": "VIN format is invalid", "param": "vin"}}""",
+                content = """{"error": {"code": "INVALID_VIN", "message": "VIN format is invalid", "description": "Expected 17 characters"}}""",
                 status = HttpStatusCode.BadRequest,
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             )
@@ -287,7 +287,7 @@ class HttpTransportTest {
 
         assertEquals("INVALID_VIN", exception.error.detail?.code)
         assertEquals("VIN format is invalid", exception.error.detail?.message)
-        assertEquals("vin", exception.error.detail?.param)
+        assertEquals("Expected 17 characters", exception.error.detail?.description)
     }
 
     // ==================== Exception Hierarchy ====================

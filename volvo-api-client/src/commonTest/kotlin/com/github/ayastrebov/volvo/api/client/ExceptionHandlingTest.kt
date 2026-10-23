@@ -353,4 +353,51 @@ class ExceptionHandlingTest {
 
         assertIs<VolvoAPIException>(exception)
     }
+
+    // ==================== Error Body Shapes ====================
+
+    @Test
+    fun connectedVehicleError_exposesDescriptionAndOperationId() = runTest {
+        val client = createTestClientWithResponse(ErrorFixtures.error404WithDescription, HttpStatusCode.NotFound)
+
+        val exception = assertFailsWith<InvalidRequestException> { client.getVehicleDetails(TestData.TEST_VIN) }
+
+        assertEquals(404, exception.error.status)
+        assertEquals(TestData.TEST_OPERATION_ID, exception.error.operationId)
+        assertEquals("Resource not found", exception.error.detail?.message)
+        assertEquals("No vehicle with the given VIN is connected to this Volvo ID", exception.error.detail?.description)
+        assertEquals("Resource not found", exception.message)
+    }
+
+    @Test
+    fun energyError_exposesNestedDetails() = runTest {
+        val client = createTestClientWithResponse(ErrorFixtures.energyError400, HttpStatusCode.BadRequest)
+
+        val exception = assertFailsWith<InvalidRequestException> { client.getEnergyState("bad") }
+
+        assertEquals("BAD_REQUEST", exception.error.detail?.code)
+        val nested = exception.error.detail?.details?.single()
+        assertEquals("INVALID_VIN", nested?.code)
+        assertEquals("VIN must be 17 characters", nested?.message)
+    }
+
+    @Test
+    fun error_takesOperationIdAndStatusFromResponseWhenBodyLacksThem() = runTest {
+        val engine = RequestCapturingMockEngine(
+            MockResponse(
+                HttpStatusCode.NotFound,
+                ErrorFixtures.error404,
+                headersOf(
+                    HttpHeaders.ContentType to listOf(ContentType.Application.Json.toString()),
+                    "vcc-api-operationid" to listOf("2759aae988a041328621986f4c626d2d"),
+                )
+            )
+        )
+        val client = createTestClient(engine.engine)
+
+        val exception = assertFailsWith<InvalidRequestException> { client.getVehicleDetails(TestData.TEST_VIN) }
+
+        assertEquals(404, exception.error.status)
+        assertEquals("2759aae988a041328621986f4c626d2d", exception.error.operationId)
+    }
 }

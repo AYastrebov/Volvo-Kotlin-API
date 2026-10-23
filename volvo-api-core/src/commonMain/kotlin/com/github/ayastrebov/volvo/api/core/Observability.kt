@@ -5,8 +5,9 @@ import kotlin.random.Random
 /**
  * Generates a [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent` header value.
  *
- * Volvo APIs support the `traceparent` header for distributed tracing.
- * Include it in [RequestOptions.headers] to correlate requests across systems.
+ * Volvo APIs support the `traceparent` header for distributed tracing. The client adds a freshly
+ * generated value to every request automatically; to correlate a call with your own trace, pass
+ * one explicitly in [RequestOptions.headers] and it takes precedence.
  *
  * Format: `{version}-{trace-id}-{parent-id}-{trace-flags}`
  * - version: `00` (current spec version)
@@ -18,7 +19,7 @@ import kotlin.random.Random
  * val traceparent = Traceparent.generate()
  * client.getVehicleList(
  *     requestOptions = RequestOptions(
- *         headers = mapOf("traceparent" to traceparent.value)
+ *         headers = mapOf(Traceparent.HEADER to traceparent.value)
  *     )
  * )
  * ```
@@ -35,6 +36,9 @@ public class Traceparent private constructor(
     override fun toString(): String = value
 
     public companion object {
+        /** Name of the W3C Trace Context request header. */
+        public const val HEADER: String = "traceparent"
+
         /**
          * Generates a new `traceparent` header with random trace and span IDs.
          *

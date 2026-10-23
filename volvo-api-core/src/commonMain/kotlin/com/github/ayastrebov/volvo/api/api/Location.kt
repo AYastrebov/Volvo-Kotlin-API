@@ -23,6 +23,8 @@ public interface Location {
      *
      * Returns a GeoJSON Feature containing the vehicle's coordinates.
      *
+     * Required scopes: `openid` and `location:read`.
+     *
      * @param vin Vehicle Identification Number
      * @param requestOptions optional request configuration
      * @return location response with GeoJSON data

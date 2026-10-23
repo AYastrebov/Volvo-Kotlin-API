@@ -4,13 +4,17 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Status of a command invocation.
+ * Status of a command invocation, as listed in the Connected Vehicle API specification.
  *
  * Note: The API may return additional status values in the future.
  * Always handle the [UNKNOWN] case for forward compatibility.
  */
 @Serializable
 public enum class InvokeStatus {
+    /** Command has been accepted and is waiting to be sent to the vehicle. */
+    @SerialName("WAITING")
+    WAITING,
+
     /** Command is currently being executed. */
     @SerialName("RUNNING")
     RUNNING,
@@ -19,11 +23,80 @@ public enum class InvokeStatus {
     @SerialName("COMPLETED")
     COMPLETED,
 
-    /** Command execution failed. */
-    @SerialName("FAILED")
-    FAILED,
+    /** Command was rejected by the vehicle or the backend. */
+    @SerialName("REJECTED")
+    REJECTED,
 
-    /** Unknown status value (forward compatibility). */
+    /** Command timed out before the vehicle acknowledged it. */
+    @SerialName("TIMEOUT")
+    TIMEOUT,
+
+    /** The vehicle could not be reached. */
+    @SerialName("CONNECTION_FAILURE")
+    CONNECTION_FAILURE,
+
+    /** The vehicle is in sleep mode and did not process the command. */
+    @SerialName("VEHICLE_IN_SLEEP")
+    VEHICLE_IN_SLEEP,
+
+    /** The unlock window expired before the door was opened. */
+    @SerialName("UNLOCK_TIME_FRAME_PASSED")
+    UNLOCK_TIME_FRAME_PASSED,
+
+    /** The vehicle could not be locked because a door is open. */
+    @SerialName("UNABLE_TO_LOCK_DOOR_OPEN")
+    UNABLE_TO_LOCK_DOOR_OPEN,
+
+    /** The command expired before it was delivered. */
+    @SerialName("EXPIRED")
+    EXPIRED,
+
+    /** The command has been sent to the vehicle. */
+    @SerialName("SENT")
+    SENT,
+
+    /** The vehicle does not support this command. */
+    @SerialName("NOT_SUPPORTED")
+    NOT_SUPPORTED,
+
+    /** The vehicle is in sleep mode. */
+    @SerialName("CAR_IN_SLEEP_MODE")
+    CAR_IN_SLEEP_MODE,
+
+    /** The command was delivered to the vehicle. */
+    @SerialName("DELIVERED")
+    DELIVERED,
+
+    /** Delivery to the vehicle timed out. */
+    @SerialName("DELIVERY_TIMEOUT")
+    DELIVERY_TIMEOUT,
+
+    /** The vehicle executed the command successfully. */
+    @SerialName("SUCCESS")
+    SUCCESS,
+
+    /** The vehicle did not respond in time. */
+    @SerialName("CAR_TIMEOUT")
+    CAR_TIMEOUT,
+
+    /** The vehicle reported an error while executing the command. */
+    @SerialName("CAR_ERROR")
+    CAR_ERROR,
+
+    /** The command is blocked because privacy mode is enabled in the vehicle. */
+    @SerialName("NOT_ALLOWED_PRIVACY_ENABLED")
+    NOT_ALLOWED_PRIVACY_ENABLED,
+
+    /** The command is not allowed in the vehicle's current usage mode. */
+    @SerialName("NOT_ALLOWED_WRONG_USAGE_MODE")
+    NOT_ALLOWED_WRONG_USAGE_MODE,
+
+    /** A command-specific error occurred; see the message for details. */
+    @SerialName("INVOCATION_SPECIFIC_ERROR")
+    INVOCATION_SPECIFIC_ERROR,
+
+    /** Status reported as unknown by the API, or a value this library does not recognise (forward compatibility). */
+    @SerialName("UNKNOWN")
     UNKNOWN;
 
     public companion object {
@@ -33,13 +106,20 @@ public enum class InvokeStatus {
          * @param value The string value to parse.
          * @return The corresponding [InvokeStatus] or [UNKNOWN] if not recognized.
          */
-        public fun fromString(value: String?): InvokeStatus = when (value?.uppercase()) {
-            "RUNNING" -> RUNNING
-            "COMPLETED" -> COMPLETED
-            "FAILED" -> FAILED
-            else -> UNKNOWN
+        public fun fromString(value: String?): InvokeStatus {
+            val normalized = value?.uppercase() ?: return UNKNOWN
+            return entries.firstOrNull { it.name == normalized } ?: UNKNOWN
         }
+
+        /** Statuses that mean the command reached the vehicle and was carried out. */
+        public val successful: Set<InvokeStatus> = setOf(COMPLETED, SUCCESS)
     }
+
+    /** `true` when the command reached the vehicle and was carried out. */
+    public val isSuccess: Boolean get() = this in successful
+
+    /** `true` while the command is still in flight (accepted, sent or running). */
+    public val isPending: Boolean get() = this == WAITING || this == SENT || this == DELIVERED || this == RUNNING
 }
 
 /**
@@ -349,6 +429,42 @@ public enum class WarningStatus {
             "NO_WARNING" -> NO_WARNING
             "WARNING" -> WARNING
             "SERVICE_REQUIRED" -> SERVICE_REQUIRED
+            else -> UNKNOWN
+        }
+    }
+}
+
+/**
+ * Charger power status, i.e. whether the connected charger is delivering power.
+ *
+ * Observed values: `PROVIDING_POWER` (live API) and `NO_POWER_AVAILABLE` (specification example).
+ *
+ * Note: The API may return additional status values in the future.
+ * Always handle the [UNKNOWN] case for forward compatibility.
+ */
+@Serializable
+public enum class ChargerPowerStatus {
+    /** The charger is delivering power to the vehicle. */
+    @SerialName("PROVIDING_POWER")
+    PROVIDING_POWER,
+
+    /** A charger is connected but no power is available. */
+    @SerialName("NO_POWER_AVAILABLE")
+    NO_POWER_AVAILABLE,
+
+    /** Unknown status value (forward compatibility). */
+    UNKNOWN;
+
+    public companion object {
+        /**
+         * Safely parses a string to [ChargerPowerStatus], returning [UNKNOWN] for unrecognized values.
+         *
+         * @param value The string value to parse.
+         * @return The corresponding [ChargerPowerStatus] or [UNKNOWN] if not recognized.
+         */
+        public fun fromString(value: String?): ChargerPowerStatus = when (value?.uppercase()) {
+            "PROVIDING_POWER" -> PROVIDING_POWER
+            "NO_POWER_AVAILABLE" -> NO_POWER_AVAILABLE
             else -> UNKNOWN
         }
     }

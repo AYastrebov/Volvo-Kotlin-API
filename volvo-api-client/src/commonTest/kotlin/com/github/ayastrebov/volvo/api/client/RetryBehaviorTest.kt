@@ -1,16 +1,19 @@
 package com.github.ayastrebov.volvo.api.client
 
 import com.github.ayastrebov.volvo.api.client.internal.createHttpClient
+import com.github.ayastrebov.volvo.api.client.internal.toRetryAfterMillis
 import com.github.ayastrebov.volvo.api.core.RetryStrategy
 import io.ktor.client.engine.mock.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.date.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -433,5 +436,24 @@ class RetryBehaviorTest {
 
         assertEquals(1, requestCount) // Only initial request
         assertEquals(HttpStatusCode.OK, response.status)
+    }
+
+    // ==================== Retry-After Parsing ====================
+
+    @Test
+    fun retryAfter_parsesDelaySeconds() {
+        assertEquals(5_000L, "5".toRetryAfterMillis())
+        assertEquals(0L, null.toRetryAfterMillis())
+        assertEquals(0L, "soon".toRetryAfterMillis())
+    }
+
+    @Test
+    fun retryAfter_parsesHttpDate() {
+        val inTenSeconds = GMTDate(GMTDate().timestamp + 10_000).toHttpDate()
+        val delay = inTenSeconds.toRetryAfterMillis()
+        assertTrue(delay in 8_000L..10_000L, "Expected ~10s delay, got $delay ms")
+
+        val inThePast = GMTDate(GMTDate().timestamp - 60_000).toHttpDate()
+        assertEquals(0L, inThePast.toRetryAfterMillis())
     }
 }

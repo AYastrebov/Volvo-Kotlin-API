@@ -226,7 +226,9 @@ class ConnectedVehicleApiTest : BaseIntegrationTest() {
 
             logResponse("getCommandAccessibility", vin, response)
             assertSuccessStatus(response.status)
-            assertNotNull(response.data, "Command accessibility should not be null")
+            val availability = assertNotNull(response.data?.availabilityStatus, "availabilityStatus should not be null")
+            assertNotNull(availability.value, "availabilityStatus.value should not be null")
+            assertNotNull(availability.timestamp, "availabilityStatus.timestamp should not be null")
         }
     }
 

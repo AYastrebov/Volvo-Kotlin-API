@@ -1,6 +1,7 @@
 package com.github.ayastrebov.volvo.api.model.energy
 
 import com.github.ayastrebov.volvo.api.model.common.ChargerConnectionStatus
+import com.github.ayastrebov.volvo.api.model.common.ChargerPowerStatus
 import com.github.ayastrebov.volvo.api.model.common.ChargingStatus
 import com.github.ayastrebov.volvo.api.model.common.ChargingType
 import com.github.ayastrebov.volvo.api.model.common.ResourceStatus
@@ -101,3 +102,13 @@ public val ResourceResultString.chargingStatusValue: ChargingStatus
  */
 public val ResourceResultString.chargingTypeValue: ChargingType
     get() = ChargingType.fromString(value)
+
+/**
+ * Returns the value as a type-safe [ChargerPowerStatus] enum.
+ *
+ * Use this when the [ResourceResultString] represents a charger power status.
+ *
+ * @return The [ChargerPowerStatus] enum, or [ChargerPowerStatus.UNKNOWN] if not recognized.
+ */
+public val ResourceResultString.chargerPowerStatusValue: ChargerPowerStatus
+    get() = ChargerPowerStatus.fromString(value)

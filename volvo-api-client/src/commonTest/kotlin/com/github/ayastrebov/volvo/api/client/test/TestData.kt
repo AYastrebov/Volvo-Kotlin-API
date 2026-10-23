@@ -107,7 +107,27 @@ object ConnectedVehicleFixtures {
         }
     """.trimIndent()
 
+    // Mirrors a live response: numeric values, automatic/manual trip meters, tank and battery range.
     val statisticsResponse = """
+        {
+            "data": {
+                "averageEnergyConsumption": {"value": 2.2374, "timestamp": "2024-01-15T10:30:00Z", "unit": "kWh/100km"},
+                "averageEnergyConsumptionAutomatic": {"value": 2.4732, "timestamp": "2024-01-15T10:30:00Z", "unit": "kWh/100km"},
+                "averageEnergyConsumptionSinceCharge": {"value": 2.4732, "timestamp": "2024-01-15T10:30:00Z", "unit": "kWh/100km"},
+                "averageFuelConsumption": {"value": 7.2374, "timestamp": "2024-01-15T10:30:00Z", "unit": "l/100km"},
+                "averageFuelConsumptionAutomatic": {"value": 7.4732, "timestamp": "2024-01-15T10:30:00Z", "unit": "l/100km"},
+                "averageSpeed": {"value": 50, "timestamp": "2024-01-15T10:30:00Z", "unit": "km/h"},
+                "averageSpeedAutomatic": {"value": 66, "timestamp": "2024-01-15T10:30:00Z", "unit": "km/h"},
+                "distanceToEmptyBattery": {"value": 200, "timestamp": "2024-01-15T10:30:00Z", "unit": "km"},
+                "distanceToEmptyTank": {"value": 1312, "timestamp": "2024-01-15T10:30:00Z", "unit": "km"},
+                "tripMeterAutomatic": {"value": 420.0, "timestamp": "2024-01-15T10:30:00Z", "unit": "km"},
+                "tripMeterManual": {"value": 500.0, "timestamp": "2024-01-15T10:30:00Z", "unit": "km"}
+            }
+        }
+    """.trimIndent()
+
+    // Shape from the published specification: string values and the older field names.
+    val statisticsSpecResponse = """
         {
             "status": 200,
             "operationId": "${TestData.TEST_OPERATION_ID}",
@@ -136,7 +156,8 @@ object ConnectedVehicleFixtures {
             "status": 200,
             "operationId": "${TestData.TEST_OPERATION_ID}",
             "data": {
-                "fuelAmount": {"value": 45.5, "timestamp": "2024-01-15T10:30:00Z", "unit": "liters"}
+                "fuelAmount": {"value": 45.5, "timestamp": "2024-01-15T10:30:00Z", "unit": "l"},
+                "batteryChargeLevel": {"value": 42.0, "timestamp": "2024-01-15T10:30:00Z", "unit": "%"}
             }
         }
     """.trimIndent()
@@ -223,13 +244,24 @@ object ConnectedVehicleFixtures {
             "status": 200,
             "operationId": "${TestData.TEST_OPERATION_ID}",
             "data": {
-                "availableCommands": [
-                    {"command": "LOCK", "href": "/vehicles/${TestData.TEST_VIN}/commands/lock"},
-                    {"command": "UNLOCK", "href": "/vehicles/${TestData.TEST_VIN}/commands/unlock"}
-                ],
-                "unavailableCommands": [
-                    {"command": "ENGINE_START", "reason": "NOT_SUPPORTED"}
-                ]
+                "availabilityStatus": {
+                    "value": "AVAILABLE",
+                    "timestamp": "2024-01-15T10:30:00Z"
+                }
+            }
+        }
+    """.trimIndent()
+
+    val commandAccessibilityUnavailableResponse = """
+        {
+            "status": 200,
+            "operationId": "${TestData.TEST_OPERATION_ID}",
+            "data": {
+                "availabilityStatus": {
+                    "value": "UNAVAILABLE",
+                    "unavailableReason": "CAR_IN_USE",
+                    "timestamp": "2024-01-15T10:30:00Z"
+                }
             }
         }
     """.trimIndent()
@@ -268,103 +300,91 @@ object EnergyFixtures {
 
     val capabilitiesResponse = """
         {
-            "status": 200,
-            "operationId": "${TestData.TEST_OPERATION_ID}",
-            "data": {
-                "getEnergyState": {
-                    "isSupported": true,
-                    "batteryChargeLevel": {"isSupported": true},
-                    "electricRange": {"isSupported": true},
-                    "chargerConnectionStatus": {"isSupported": true},
-                    "chargingSystemStatus": {"isSupported": true},
-                    "chargingType": {"isSupported": true},
-                    "chargerPowerStatus": {"isSupported": true},
-                    "estimatedChargingTimeToTargetBatteryChargeLevel": {"isSupported": true},
-                    "chargingCurrentLimit": {"isSupported": true},
-                    "targetBatteryChargeLevel": {"isSupported": true},
-                    "chargingPower": {"isSupported": false}
-                }
+            "getEnergyState": {
+                "isSupported": true,
+                "batteryChargeLevel": {"isSupported": true},
+                "electricRange": {"isSupported": true},
+                "chargerConnectionStatus": {"isSupported": true},
+                "chargingSystemStatus": {"isSupported": true},
+                "chargingType": {"isSupported": true},
+                "chargerPowerStatus": {"isSupported": true},
+                "estimatedChargingTimeToTargetBatteryChargeLevel": {"isSupported": true},
+                "chargingCurrentLimit": {"isSupported": true},
+                "targetBatteryChargeLevel": {"isSupported": true},
+                "chargingPower": {"isSupported": false}
             }
-        }
+}
     """.trimIndent()
 
     val energyStateResponse = """
         {
-            "status": 200,
-            "operationId": "${TestData.TEST_OPERATION_ID}",
-            "data": {
-                "batteryChargeLevel": {
-                    "status": "OK",
-                    "value": 78.5,
-                    "updatedAt": "2024-01-15T10:30:00Z",
-                    "unit": "percent"
-                },
-                "electricRange": {
-                    "status": "OK",
-                    "value": 285,
-                    "updatedAt": "2024-01-15T10:30:00Z",
-                    "unit": "km"
-                },
-                "chargerConnectionStatus": {
-                    "status": "OK",
-                    "value": "CONNECTED",
-                    "updatedAt": "2024-01-15T10:30:00Z"
-                },
-                "chargingStatus": {
-                    "status": "OK",
-                    "value": "CHARGING",
-                    "updatedAt": "2024-01-15T10:30:00Z"
-                },
-                "chargingType": {
-                    "status": "OK",
-                    "value": "AC",
-                    "updatedAt": "2024-01-15T10:30:00Z"
-                },
-                "chargerPowerStatus": {
-                    "status": "OK",
-                    "value": "HIGH_POWER",
-                    "updatedAt": "2024-01-15T10:30:00Z"
-                },
-                "estimatedChargingTimeToTargetBatteryChargeLevel": {
-                    "status": "OK",
-                    "value": 120,
-                    "updatedAt": "2024-01-15T10:30:00Z",
-                    "unit": "minutes"
-                },
-                "targetBatteryChargeLevel": {
-                    "status": "OK",
-                    "value": 80,
-                    "updatedAt": "2024-01-15T10:30:00Z",
-                    "unit": "percent"
-                },
-                "chargingCurrentLimit": {
-                    "status": "OK",
-                    "value": 16,
-                    "updatedAt": "2024-01-15T10:30:00Z",
-                    "unit": "ampere"
-                }
+            "batteryChargeLevel": {
+                "status": "OK",
+                "value": 78.5,
+                "updatedAt": "2024-01-15T10:30:00Z",
+                "unit": "percent"
+            },
+            "electricRange": {
+                "status": "OK",
+                "value": 285,
+                "updatedAt": "2024-01-15T10:30:00Z",
+                "unit": "km"
+            },
+            "chargerConnectionStatus": {
+                "status": "OK",
+                "value": "CONNECTED",
+                "updatedAt": "2024-01-15T10:30:00Z"
+            },
+            "chargingStatus": {
+                "status": "OK",
+                "value": "CHARGING",
+                "updatedAt": "2024-01-15T10:30:00Z"
+            },
+            "chargingType": {
+                "status": "OK",
+                "value": "AC",
+                "updatedAt": "2024-01-15T10:30:00Z"
+            },
+            "chargerPowerStatus": {
+                "status": "OK",
+                "value": "HIGH_POWER",
+                "updatedAt": "2024-01-15T10:30:00Z"
+            },
+            "estimatedChargingTimeToTargetBatteryChargeLevel": {
+                "status": "OK",
+                "value": 120,
+                "updatedAt": "2024-01-15T10:30:00Z",
+                "unit": "minutes"
+            },
+            "targetBatteryChargeLevel": {
+                "status": "OK",
+                "value": 80,
+                "updatedAt": "2024-01-15T10:30:00Z",
+                "unit": "percent"
+            },
+            "chargingCurrentLimit": {
+                "status": "OK",
+                "value": 16,
+                "updatedAt": "2024-01-15T10:30:00Z",
+                "unit": "ampere"
             }
-        }
+}
     """.trimIndent()
 
     val energyStateErrorResponse = """
         {
-            "status": 200,
-            "operationId": "${TestData.TEST_OPERATION_ID}",
-            "data": {
-                "batteryChargeLevel": {
-                    "status": "ERROR",
-                    "code": "DATA_NOT_AVAILABLE",
-                    "message": "Data is temporarily unavailable"
-                },
-                "electricRange": {
-                    "status": "OK",
-                    "value": 285,
-                    "updatedAt": "2024-01-15T10:30:00Z",
-                    "unit": "km"
-                }
+            "batteryChargeLevel": {
+                "status": "ERROR",
+                "code": "DATA_NOT_AVAILABLE",
+                "message": "Data is temporarily unavailable"
+            },
+            "electricRange": {
+                "status": "OK",
+                "value": 285,
+                "updatedAt": "2024-01-15T10:30:00Z",
+                "unit": "km"
             }
-        }
+}
     """.trimIndent()
 }
 
@@ -443,6 +463,29 @@ object ErrorFixtures {
             "error": {
                 "code": "NOT_FOUND",
                 "message": "Vehicle not found"
+            }
+        }
+    """.trimIndent()
+
+    val error404WithDescription = """
+        {
+            "status": 404,
+            "operationId": "${TestData.TEST_OPERATION_ID}",
+            "error": {
+                "message": "Resource not found",
+                "description": "No vehicle with the given VIN is connected to this Volvo ID"
+            }
+        }
+    """.trimIndent()
+
+    val energyError400 = """
+        {
+            "error": {
+                "code": "BAD_REQUEST",
+                "message": "Invalid request",
+                "details": [
+                    {"code": "INVALID_VIN", "message": "VIN must be 17 characters"}
+                ]
             }
         }
     """.trimIndent()
