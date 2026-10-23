@@ -2,18 +2,32 @@ name: Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish, with the v prefix (e.g. v0.7.0)'
+        required: true
+        type: string
   push:
     tags:
       - 'v*'
 
 env:
-  DEPLOY_VERSION: ${{ github.ref_name }}
+  # Tag name on tag pushes; the explicit input on manual runs (otherwise a manual run
+  # from master would publish a version literally named "master").
+  DEPLOY_VERSION: ${{ inputs.version || github.ref_name }}
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check version format
+        run: |
+          if [[ ! "$DEPLOY_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
+            echo "DEPLOY_VERSION must look like v1.2.3, got '$DEPLOY_VERSION'" >&2
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
 
