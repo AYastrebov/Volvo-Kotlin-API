@@ -54,5 +54,5 @@ Usage is in `README.MD`; the human contributor workflow is in `CONTRIBUTING.md`.
 
 - `OpenApi/` — Volvo's published OpenAPI specs (endpoint source of truth, with the caveat above)
 - `docs/` — per-endpoint reference; `docs/authorization.md` holds the scope table
-- `.claude/skills/volvo-kotlin-api/SKILL.md` — step-by-step procedures: adding an endpoint, a config class, verifying models against the live API, releasing
-- `.claude/skills/volvo-api-integration/SKILL.md` — guide for consumers of the library
+- `.agents/skills/volvo-kotlin-api/SKILL.md` — step-by-step procedures: adding an endpoint, a config class, verifying models against the live API, releasing
+- `.agents/skills/volvo-api-integration/SKILL.md` — guide for consumers of the library
