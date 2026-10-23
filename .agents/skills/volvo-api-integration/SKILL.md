@@ -39,7 +39,7 @@ The GitHub token needs `read:packages` scope. Generate one at https://github.com
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("com.github.ayastrebov.volvo:volvo-api-client:0.6.0")
+    implementation("com.github.ayastrebov.volvo:volvo-api-client:0.7.0")
 }
 ```
 

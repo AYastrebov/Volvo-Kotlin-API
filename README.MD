@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.ayastrebov.volvo:volvo-api-client:0.6.0")
+    implementation("com.github.ayastrebov.volvo:volvo-api-client:0.7.0")
 
     // Pick a Ktor engine for your platform:
     implementation("io.ktor:ktor-client-okhttp:3.4.3")    // JVM / Android
